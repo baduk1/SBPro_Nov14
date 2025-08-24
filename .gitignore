@@ -1,0 +1,14 @@
+backend/.venv
+backend/boq.db
+backend/*.db
+.pyc
+pycache/
+.env
+.env.
+.DS_Store
+.pytest_cache/
+
+frontend/node_modules/
+frontend/dist/
+
+
