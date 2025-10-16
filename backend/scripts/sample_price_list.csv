@@ -1,0 +1,11 @@
+code,description,unit,rate
+ITEM001,Concrete mix,m3,75.0
+ITEM002,Steel rebar,kg,1.2
+ITEM003,Lumber 2x4,piece,3.5
+ITEM004,Drywall sheet,sheet,10.0
+ITEM005,Insulation roll,roll,15.0
+ITEM006,Roof shingles,bundle,50.0
+ITEM007,Paint gallon,gallon,25.0
+ITEM008,Electrical wire,meter,0.8
+ITEM009,PVC pipe,meter,2.5
+ITEM010,Copper fittings,piece,1.0

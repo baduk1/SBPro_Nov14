@@ -5,9 +5,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import create_access_token, verify_password, get_password_hash
+from app.core.security import create_access_token, verify_password, get_password_hash, get_current_user
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.auth import Token
 from app.schemas.user import UserOut
 
@@ -19,7 +19,10 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hash):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    token = create_access_token({"sub": user.id}, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    token = create_access_token(
+        {"sub": user.id, "role": user.role},
+        timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
     return Token(access_token=token)
 
 
@@ -32,14 +35,12 @@ def seed_admin(db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == email).first()
     if user:
         return {"created": False, "email": email}
-    u = User(email=email, role="admin", hash=get_password_hash("admin123"))
+    u = User(email=email, role=UserRole.ADMIN.value, hash=get_password_hash("admin123"))
     db.add(u)
     db.commit()
     return {"created": True, "email": email, "password": "admin123"}
 
 
 @router.get("/me", response_model=UserOut)
-def me(user: User = Depends(lambda: None), db: Session = Depends(get_db)):
-    # For MVP, return the seeded admin if present (no strict guard to simplify demo)
-    u = db.query(User).filter(User.email == "admin@example.com").first()
-    return u or UserOut(id="n/a", email="guest@example.com", role="guest")  # type: ignore
+def me(user: User = Depends(get_current_user)):
+    return user

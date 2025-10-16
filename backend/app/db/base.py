@@ -11,3 +11,4 @@ from app.models.price_item import PriceItem  # noqa: F401
 from app.models.artifact import Artifact  # noqa: F401
 from app.models.mapping import DwgLayerMap, IfcClassMap  # noqa: F401
 from app.models.access_request import AccessRequest  # noqa: F401
+from app.models.supplier import Supplier, SupplierPriceItem  # noqa: F401

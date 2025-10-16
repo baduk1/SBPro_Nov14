@@ -1,4 +1,4 @@
-# Blueprint Estimator Hub — Backend (FastAPI)
+# SkyBuild Pro — Backend (FastAPI)
 
 MVP backend implementing upload → job pipeline → take‑off (mocked) → price application → BoQ exports (CSV/XLSX/PDF) with SSE status updates.
 

@@ -2,11 +2,14 @@ import csv
 import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
 from openpyxl import Workbook
 from sqlalchemy.orm import Session
 
 from app.models.boq_item import BoqItem
 from app.models.price_item import PriceItem
+from app.models.price_list import PriceList
+from app.models.job import Job
 from app.models.artifact import Artifact
 from app.services.storage import artifacts_path
 
@@ -43,6 +46,8 @@ def export_csv(db: Session, job_id: str) -> Artifact:
         writer.writeheader()
         for r in rows:
             writer.writerow(r)
+        total = sum(float(r["amount"]) for r in rows)
+        writer.writerow({"code": "", "description": "TOTAL", "unit": "", "qty": "", "allowance": "", "rate": "", "amount": total})
     art = Artifact(job_id=job_id, kind="export:csv", path=filename, size=os.path.getsize(filename))
     db.add(art)
     db.commit()
@@ -59,6 +64,8 @@ def export_xlsx(db: Session, job_id: str) -> Artifact:
     ws.append(headers)
     for r in rows:
         ws.append([r[h] for h in headers])
+    last = ws.max_row
+    ws.append(["", "", "", "", "", "TOTAL", f"=SUM(G2:G{last})"])
     filename = artifacts_path(job_id, "boq.xlsx")
     wb.save(filename)
     art = Artifact(job_id=job_id, kind="export:xlsx", path=filename, size=os.path.getsize(filename))
@@ -73,21 +80,66 @@ def export_pdf(db: Session, job_id: str) -> Artifact:
     filename = artifacts_path(job_id, "boq.pdf")
     c = canvas.Canvas(filename, pagesize=A4)
     width, height = A4
-    y = height - 40
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(40, y, "Bill of Quantities")
-    y -= 25
+    margin = 18 * mm
+    y = height - margin
+
+    job = db.query(Job).get(job_id)
+    currency = "—"
+    if job and job.price_list_id:
+        pl = db.query(PriceList).get(job.price_list_id)
+        if pl and pl.currency:
+            currency = pl.currency
+
+    c.setFont("Helvetica-Bold", 15)
+    c.drawString(margin, y, "Bill of Quantities — Priced")
+    y -= 8 * mm
     c.setFont("Helvetica", 10)
+    c.drawString(margin, y, f"Currency: {currency}")
+    y -= 6 * mm
+
     headers = ["Code", "Description", "Unit", "Qty", "Allowance", "Rate", "Amount"]
-    c.drawString(40, y, " | ".join(headers))
-    y -= 18
+    colx = [margin, margin + 28 * mm, margin + 115 * mm, margin + 135 * mm, margin + 152 * mm, margin + 172 * mm, margin + 190 * mm]
+    c.setFont("Helvetica-Bold", 10)
+    for i, h in enumerate(headers):
+        c.drawString(colx[i], y, h)
+    y -= 5 * mm
+    c.line(margin, y, width - margin, y)
+    y -= 4 * mm
+    c.setFont("Helvetica", 9)
+
+    def fmt_money(v):
+        try:
+            return f"{float(v):,.2f}"
+        except Exception:
+            return str(v)
+
+    total = 0.0
     for r in rows:
-        line = f"{r['code']} | {r['description'][:40]} | {r['unit']} | {r['qty']} | {r['allowance']} | {r['rate']} | {r['amount']}"
-        if y < 60:
+        amt = float(r["amount"] or 0.0)
+        total += amt
+        cells = [
+            r["code"] or "",
+            (r["description"] or "")[:60],
+            r["unit"],
+            f"{r['qty']}",
+            fmt_money(r["allowance"]),
+            fmt_money(r["rate"]),
+            fmt_money(amt),
+        ]
+        if y < margin + 25 * mm:
             c.showPage()
-            y = height - 40
-        c.drawString(40, y, line)
-        y -= 14
+            y = height - margin
+            c.setFont("Helvetica", 9)
+        for i, t in enumerate(cells):
+            c.drawString(colx[i], y, t)
+        y -= 5 * mm
+
+    y -= 2 * mm
+    c.line(margin, y, width - margin, y)
+    y -= 7 * mm
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(colx[5], y, "TOTAL:")
+    c.drawRightString(width - margin, y, f"{fmt_money(total)} {currency}")
     c.save()
     art = Artifact(job_id=job_id, kind="export:pdf", path=filename, size=os.path.getsize(filename))
     db.add(art)

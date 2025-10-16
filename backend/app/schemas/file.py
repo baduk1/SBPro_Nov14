@@ -1,5 +1,12 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Dict
+from typing import Dict, Optional
+
+
+class PresignUploadRequest(BaseModel):
+    project_id: str
+    filename: str
+    file_type: str
+    content_type: Optional[str] = None
 
 
 class FileOut(BaseModel):

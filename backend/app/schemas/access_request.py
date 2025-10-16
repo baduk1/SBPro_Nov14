@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 
 class AccessRequestCreate(BaseModel):
@@ -7,6 +8,10 @@ class AccessRequestCreate(BaseModel):
     email: str
     company: Optional[str] = None
     message: Optional[str] = None
+
+
+class AccessRequestUpdate(BaseModel):
+    status: Optional[str] = None
 
 
 class AccessRequestOut(BaseModel):
@@ -17,4 +22,4 @@ class AccessRequestOut(BaseModel):
     company: Optional[str]
     message: Optional[str]
     status: str
-    created_at: str
+    created_at: datetime

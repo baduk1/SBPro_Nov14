@@ -1,0 +1,38 @@
+[
+  {
+    "layer_name": "PL_PIPE*",
+    "element_type": "Pipe Run",
+    "default_unit": "m",
+    "default_code": "P10/100"
+  },
+  {
+    "layer_name": "ELEC-LIGHTING*",
+    "element_type": "Cable Run",
+    "default_unit": "m",
+    "default_code": "P40/100"
+  },
+  {
+    "layer_name": "HVAC-DUCT*",
+    "element_type": "Duct Run",
+    "default_unit": "m",
+    "default_code": "P30/100"
+  },
+  {
+    "layer_name": "FIRE-PIPE*",
+    "element_type": "Pipe Run",
+    "default_unit": "m",
+    "default_code": "P10/100"
+  },
+  {
+    "layer_name": "PL_PIPE",
+    "element_type": "Pipe Run",
+    "default_unit": "m",
+    "default_code": "P10/100"
+  },
+  {
+    "layer_name": "ELEC-LIGHTING",
+    "element_type": "Cable Run",
+    "default_unit": "m",
+    "default_code": "P40/100"
+  }
+]

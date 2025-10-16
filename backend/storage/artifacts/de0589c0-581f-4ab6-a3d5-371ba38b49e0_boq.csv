@@ -1,0 +1,4 @@
+code,description,unit,qty,allowance,rate,amount
+,Ductwork (Layer:Duct),m,100.59,0.0,0.0,0.0
+,Piping (Layer:Pipe),m,148.45,0.0,0.0,0.0
+,Cabling (Layer:Cable),m,261.83,0.0,0.0,0.0

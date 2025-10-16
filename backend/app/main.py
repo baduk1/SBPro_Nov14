@@ -6,20 +6,31 @@ from app.db.base import Base
 from app.db.session import engine
 from app.api.v1.router import api_router
 
+# Fail fast: SECRET_KEY must be set for staging/prod (and dev, если хочешь дисциплины)
+if not settings.SECRET_KEY or settings.SECRET_KEY.strip() in ("", "CHANGE_ME_SUPER_SECRET"):
+    raise RuntimeError("SECRET_KEY must be set via env. Month-2 production foundation requires secure secrets.")
+
 # Create DB schema (dev). In production, use Alembic migrations.
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Blueprint Estimator Hub API",
+    title="SkyBuild Pro API",
     version="1.0.0",
     openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
     docs_url=f"{settings.API_V1_PREFIX}/docs",
     redoc_url=f"{settings.API_V1_PREFIX}/redoc",
 )
 
+cors_origins = list(dict.fromkeys(settings.BACKEND_CORS_ORIGINS))
+if settings.USER_APP_ORIGIN:
+    cors_origins.append(settings.USER_APP_ORIGIN)
+if settings.ADMIN_APP_ORIGIN:
+    cors_origins.append(settings.ADMIN_APP_ORIGIN)
+cors_origins = list(dict.fromkeys(cors_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

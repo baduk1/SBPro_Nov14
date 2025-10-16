@@ -1,0 +1,7 @@
+layer_name,element_type,default_unit,default_code
+PL_PIPE*,Pipe Run,m,P10/100
+ELEC-LIGHTING*,Cable Run,m,P40/100
+HVAC-DUCT*,Duct Run,m,P30/100
+FIRE-PIPE*,Pipe Run,m,P10/100
+PL_PIPE,Pipe Run,m,P10/100
+ELEC-LIGHTING,Cable Run,m,P40/100

@@ -2,11 +2,16 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.api.deps import require_admin
 from app.db.session import get_db
 from app.models.mapping import DwgLayerMap, IfcClassMap
 from app.schemas.mapping import DwgLayerMapIn, IfcClassMapIn
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/mappings",
+    tags=["Admin: Mappings"],
+    dependencies=[Depends(require_admin)],
+)
 
 
 @router.get("/dwg-layers", response_model=List[DwgLayerMapIn])

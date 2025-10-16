@@ -1,0 +1,489 @@
+code,description,unit,qty,allowance,rate,amount
+P20/200,Flow Controller – M_Backflow Preventer_ DCW to Hydronic Supply_15-50 mm_:25 mm:25 mm:591225,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Backflow Preventer_ DCW to Hydronic Supply_15-50 mm_:25 mm:25 mm:593194,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Backflow Preventer_ DCW to Hydronic Supply_15-50 mm_:25 mm:25 mm:593973,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Backflow Preventer_ DCW to Hydronic Supply_15-50 mm_:25 mm:25 mm:594130,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Ball Valve - 50-150 mm:50 mm:50 mm:578433,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Ball Valve - 50-150 mm:50 mm:50 mm:578607,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Ball Valve - 50-150 mm:50 mm:50 mm:579237,piece,2.0,0.0,25.0,50.0
+P20/200,Flow Controller – M_Ball Valve - 50-150 mm:50 mm:50 mm:579260,piece,2.0,0.0,25.0,50.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:545367,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:546380,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:546395,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:546904,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:547147,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:548141,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:548144,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:549664,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:549727,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:549943,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:550034,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:550083,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:550223,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:550225,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557546,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557547,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557551,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557554,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557556,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557558,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557565,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557572,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557618,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557619,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557651,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557660,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:557665,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:577791,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:577810,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:577875,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:577876,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:577966,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578049,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578144,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578189,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578195,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578386,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578388,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578486,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578596,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578598,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578712,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578748,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578831,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:578873,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:579354,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:579386,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:579415,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:579514,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:580397,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:580429,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:581029,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:581164,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:584240,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:593346,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:594163,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600233,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600269,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600282,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600493,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600509,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600517,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600581,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600590,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600599,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600699,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600710,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600862,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600907,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:600922,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601021,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601037,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601051,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601157,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601283,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601288,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601382,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:601384,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606450,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606495,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606523,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606552,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606554,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606592,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606628,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606680,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606724,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606753,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606790,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606821,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606902,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:606964,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:612985,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:613016,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:613017,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:630393,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:630850,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631122,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631124,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631165,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631197,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631285,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631338,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631907,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631971,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631992,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:631994,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632056,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632428,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632430,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632458,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632460,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632634,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632745,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632747,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632749,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632768,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632816,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:632824,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:633346,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:633348,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:633350,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:633373,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:633375,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:649438,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:649439,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:649468,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:649469,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:660868,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:660869,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:660955,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:660967,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:661148,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:661181,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:662834,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:662982,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:663000,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:663239,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:663273,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:696231,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Elbow - Generic:Standard:Standard:696282,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Rectangular to Round Transition - Angle:45 Degree:45 Degree:602990,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Rectangular to Round Transition - Angle:45 Degree:45 Degree:603490,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:546905,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:547149,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:547619,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:547884,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:548088,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:548122,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:549959,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:550040,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557566,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557573,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557598,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557602,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557613,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557616,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557645,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:557653,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:577812,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:577871,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:577919,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:577990,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:578229,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:578422,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:578707,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:578743,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:578774,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:580417,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:593348,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:593705,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:600265,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:600278,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:600910,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:600924,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:601285,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:631162,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:631333,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:631966,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:632054,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:632424,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:632455,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:632678,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:632819,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:633331,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:633378,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:649434,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:649464,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:658559,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:660964,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Tee - Generic:Standard:Standard:661546,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:550098,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:554027,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:578414,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:578599,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:578610,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:578611,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:579165,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:579263,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:581027,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:581046,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:584239,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:584241,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:661150,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:661183,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:663179,piece,2.0,0.0,4.0,8.0
+P20/300,Flow Fitting – M_Transition - Generic:Standard:Standard:663237,piece,2.0,0.0,4.0,8.0
+nan,IfcEnergyConversionDevice – M_Hot Water Boiler - 59-440 kW:147 kW:147 kW:530072,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Hot Water Boiler - 59-440 kW:147 kW:147 kW:557516,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:535063,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:536357,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:536919,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:538562,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:538847,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:548240,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:549304,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557517,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557519,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557520,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557522,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557524,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557620,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:557628,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:629670,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:630326,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:631726,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:632215,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:632515,piece,1.0,0.0,0.0,0.0
+nan,IfcEnergyConversionDevice – M_Radiator - Hosted:25:25:633263,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowMovingDevice – M_Centrifugal Fan -  Rooftop  - Upblast:991-1905 LPS:991-1905 LPS:602113,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowMovingDevice – M_Centrifugal Fan -  Rooftop  - Upblast:991-1905 LPS:991-1905 LPS:602396,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowMovingDevice – M_Inline Pump - Circulator:3.9 LPS - 0.8 Meter Head:3.9 LPS - 0.8 Meter Head:550094,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowMovingDevice – M_Inline Pump - Circulator:3.9 LPS - 0.8 Meter Head:3.9 LPS - 0.8 Meter Head:580717,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Hot Water:583610,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Hot Water:583768,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Hot Water:593619,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Hot Water:593630,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:540160,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:540175,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:540182,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:540200,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:545888,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546125,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546131,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546374,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546381,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546819,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546826,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546828,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546906,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:546969,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547114,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547121,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547146,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547150,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547183,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547247,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547266,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547273,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547286,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547487,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547595,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547742,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547784,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547802,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547856,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:547956,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548047,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548082,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548089,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548116,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548123,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:548835,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:549038,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:549955,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:549960,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550018,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550028,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550036,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550041,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550067,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:550077,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:554197,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:554437,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:554580,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:554945,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:555449,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:555856,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557526,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557527,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557528,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557530,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557550,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557552,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557553,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557555,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557557,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557563,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557564,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557567,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557568,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557569,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557570,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557571,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557574,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557576,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557586,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557587,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557590,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557596,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557597,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557599,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557601,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557603,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557604,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557605,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557609,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557611,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557612,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557614,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557615,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557617,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557622,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557623,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557644,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557646,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557647,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557648,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557652,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557654,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557655,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557656,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557685,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557689,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557695,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557700,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:557710,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577748,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577808,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577813,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577870,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577872,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577911,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577920,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:577991,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578143,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578188,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578228,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578230,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578268,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578403,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578423,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578435,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578472,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578485,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578532,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578609,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578656,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578706,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578708,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578742,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578744,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578775,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578830,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:578872,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:579139,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:579262,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:580418,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:581020,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:581037,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:581158,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:581159,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:581179,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:583745,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:584238,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:593062,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:593349,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:593706,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600257,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600266,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600272,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600279,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600381,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600449,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600503,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600555,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600584,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600695,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600701,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600783,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600787,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600896,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600911,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600913,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600925,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:600952,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601015,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601031,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601142,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601282,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601286,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601371,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:601377,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:612977,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:612986,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:630588,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:630842,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631112,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631121,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631126,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631163,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631173,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631181,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631284,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631288,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631334,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631905,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631906,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631911,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631967,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631981,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631990,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631991,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:631996,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632407,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632415,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632423,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632425,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632436,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632442,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632454,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632456,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632624,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632630,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632679,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632681,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632738,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632744,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632756,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632764,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632808,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632815,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:632820,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633327,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633332,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633334,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633344,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633345,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633360,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633371,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633372,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:633379,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:648917,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649429,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649430,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649433,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649435,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649459,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649460,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649463,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:649465,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660059,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660890,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660902,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660930,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660957,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:660965,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:661027,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:661731,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:662830,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:662948,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:662976,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:663230,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:663251,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:663265,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:694400,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Pipe Types:Mechanical Pipe:696275,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Round Duct:Taps:557534,piece,1.0,0.0,0.0,0.0
+nan,IfcFlowSegment – Round Duct:Taps:603399,piece,1.0,0.0,0.0,0.0
+,TOTAL,,,,,2056.0

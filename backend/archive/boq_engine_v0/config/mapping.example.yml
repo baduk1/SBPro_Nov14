@@ -1,0 +1,27 @@
+
+# Mapping tells the engine how to interpret IFC types and DXF layers/blocks.
+
+ifc:
+  PipeSegment:     { code: "PIP", unit: "m" }
+  SanitaryTerminal: { code: "FIX-SAN", unit: "item" }
+  CableSegment:    { code: "CAB", unit: "m" }
+  LightFixture:    { code: "LUM", unit: "item" }
+  Outlet:          { code: "OUT", unit: "item" }
+  SwitchingDevice: { code: "SW",  unit: "item" }
+  ElectricDistributionBoard: { code: "DB", unit: "item" }
+
+# DXF layer → category defaults (used for length of lines/polylines on the layer)
+dwg_layers:
+  "Layer:Pipe":     { type: "pipe",   code: "PIP", unit: "m", description: "Pipe run" }
+  "PL_PIPE":        { type: "pipe",   code: "PIP", unit: "m", description: "Pipe run" }
+  "Layer:Cable":    { type: "cable",  code: "CAB", unit: "m", description: "Cable run" }
+  "ELEC-LIGHTING":  { type: "cable",  code: "CAB", unit: "m", description: "Lighting cable" }
+  "PLUMBING":       { type: "pipe",   code: "PIP", unit: "m", description: "Plumbing pipe" }
+
+# DXF block name → item (used for counting fixtures/devices)
+blocks:
+  "SINK":           { code: "FIX-SAN", unit: "item", description: "Sink" }
+  "WC":             { code: "FIX-SAN", unit: "item", description: "Toilet" }
+  "LIGHT":          { code: "LUM",     unit: "item", description: "Light fixture" }
+  "SWITCH_1W":      { code: "SW",      unit: "item", description: "Switch 1-way" }
+  "SOCKET_DBL":     { code: "OUT",     unit: "item", description: "Double socket outlet" }

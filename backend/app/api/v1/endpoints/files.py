@@ -1,30 +1,57 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 import os
 
+from app.api.deps import current_user
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.file import File
-from app.schemas.file import FileOut, PresignedUpload
-from app.services.storage import uploads_path
+from app.models.user import User
+from app.schemas.file import FileOut, PresignedUpload, PresignUploadRequest
+from app.services.storage import uploads_path, generate_presigned_url, verify_presigned
 
 router = APIRouter()
 
 
 @router.post("", response_model=PresignedUpload)
-def create_presigned(project_id: str, filename: str, ftype: str, db: Session = Depends(get_db)):
-    f = File(project_id=project_id, user_id="seed-owner", filename=filename, type=ftype)
+def create_presigned(
+    payload: PresignUploadRequest,
+    ttl_seconds: Optional[int] = None,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+):
+    ftype_u = (payload.file_type or "").upper()
+    if ftype_u not in settings.ALLOWED_UPLOAD_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type: {payload.file_type}")
+    f = File(project_id=payload.project_id, user_id=user.id, filename=payload.filename, type=ftype_u)
     db.add(f)
     db.commit()
     db.refresh(f)
-    return PresignedUpload(file_id=f.id, upload_url=f"/api/v1/files/{f.id}/content")
+    upload_path = f"{settings.API_V1_PREFIX}/files/{f.id}/content"
+    url = generate_presigned_url(upload_path, action="upload", subject_id=f.id, ttl_seconds=ttl_seconds)
+    headers = {"Content-Type": payload.content_type or "application/octet-stream"}
+    return PresignedUpload(file_id=f.id, upload_url=url, headers=headers)
 
 
 @router.put("/{file_id}/content")
-async def upload_content(file_id: str, request: Request, db: Session = Depends(get_db)):
+async def upload_content(
+    file_id: str,
+    request: Request,
+    act: str = Query(..., description="Action token must be 'upload'"),
+    exp: int = Query(..., description="Unix timestamp (expiry)"),
+    sig: str = Query(..., description="HMAC-SHA256 signature"),
+    db: Session = Depends(get_db),
+):
+    if act != "upload":
+        raise HTTPException(status_code=400, detail="Invalid action")
     f = db.query(File).get(file_id)
     if not f:
         raise HTTPException(status_code=404, detail="File not found")
+    try:
+        verify_presigned("upload", file_id, exp, sig)
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     dest = uploads_path(file_id)
     body = await request.body()
     with open(dest, "wb") as out:
@@ -35,8 +62,9 @@ async def upload_content(file_id: str, request: Request, db: Session = Depends(g
 
 
 @router.get("/{file_id}", response_model=FileOut)
-def get_file(file_id: str, db: Session = Depends(get_db)):
+def get_file(file_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)):
     f = db.query(File).get(file_id)
     if not f:
         raise HTTPException(status_code=404, detail="File not found")
+    # Optionally: check ownership/project membership here
     return f

@@ -3,20 +3,33 @@ from sqlalchemy.orm import Session
 import csv, io
 from typing import List
 
+from app.api.deps import require_admin
 from app.db.session import get_db
 from app.models.price_list import PriceList
 from app.models.price_item import PriceItem
 from app.schemas.price import PriceListCreate, PriceListOut
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/price-lists",
+    tags=["Admin: Price Lists"],
+    dependencies=[Depends(require_admin)],
+)
 
 
-@router.get("/price-lists", response_model=List[PriceListOut])
+@router.get("", response_model=List[PriceListOut])
 def list_price_lists(db: Session = Depends(get_db)):
     return db.query(PriceList).all()
 
 
-@router.post("/price-lists", response_model=PriceListOut)
+@router.get("/active", response_model=PriceListOut)
+def get_active_price_list(db: Session = Depends(get_db)):
+    pl = db.query(PriceList).filter(PriceList.is_active == True).order_by(PriceList.effective_from.desc().nullslast()).first()  # noqa: E712
+    if not pl:
+        raise HTTPException(status_code=404, detail="No active price list")
+    return pl
+
+
+@router.post("", response_model=PriceListOut)
 def create_price_list(payload: PriceListCreate, db: Session = Depends(get_db)):
     p = PriceList(**payload.dict())
     db.add(p)
@@ -25,7 +38,7 @@ def create_price_list(payload: PriceListCreate, db: Session = Depends(get_db)):
     return p
 
 
-@router.post("/price-lists/{id}/items:bulk")
+@router.post("/{id}/items:bulk")
 def bulk_items(id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
     pl = db.query(PriceList).get(id)
     if not pl:
@@ -47,7 +60,7 @@ def bulk_items(id: str, file: UploadFile = File(...), db: Session = Depends(get_
     return {"created": created}
 
 
-@router.patch("/price-lists/{id}", response_model=PriceListOut)
+@router.patch("/{id}", response_model=PriceListOut)
 def update_price_list(id: str, payload: PriceListCreate, db: Session = Depends(get_db)):
     pl = db.query(PriceList).get(id)
     if not pl:

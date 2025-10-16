@@ -1,0 +1,12 @@
+# Core
+pandas>=2.2
+pyyaml>=6.0.1
+
+# IFC
+ifcopenshell>=0.7
+
+# DXF
+ezdxf>=1.1.4
+
+# Export
+openpyxl>=3.1

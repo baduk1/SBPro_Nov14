@@ -1,0 +1,161 @@
+# Mapping of IFC classes to normalized BoQ element categories and default units/codes
+# You can extend this file safely. Overrides take precedence over base class mappings.
+ifc_classes:
+  IfcWall:
+    element_type: Wall
+    unit: m2
+    code: E10/100
+    description: "{element_type} – {name}"
+    quantity: area
+  IfcWallStandardCase:
+    element_type: Wall
+    unit: m2
+    code: E10/100
+    description: "{element_type} – {name}"
+    quantity: area
+  IfcSlab:
+    element_type: Floor
+    unit: m2
+    code: F10/100
+    description: "{element_type} – {name}"
+    quantity: area
+  IfcDoor:
+    element_type: Door
+    unit: piece
+    code: L10/100
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcWindow:
+    element_type: Window
+    unit: piece
+    code: L10/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcColumn:
+    element_type: Column
+    unit: m3
+    code: E20/200
+    description: "{element_type} – {name}"
+    quantity: volume
+  IfcBeam:
+    element_type: Beam
+    unit: m3
+    code: E20/300
+    description: "{element_type} – {name}"
+    quantity: volume
+  IfcCovering:
+    element_type: Finish
+    unit: m2
+    code: F30/100
+    description: "{element_type} – {name}"
+    quantity: area
+  IfcSpace:
+    element_type: Room
+    unit: m2
+    code:
+    description: "{element_type} – {name}"
+    quantity: area
+  IfcStair:
+    element_type: Stair
+    unit: piece
+    code: E40/100
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcPipeSegment:
+    element_type: Pipe Run
+    unit: m
+    code: P10/100
+    description: "{element_type} – {name}"
+    quantity: length
+  IfcDuctSegment:
+    element_type: Duct Run
+    unit: m
+    code: P30/100
+    description: "{element_type} – {name}"
+    quantity: length
+  IfcCableSegment:
+    element_type: Cable Run
+    unit: m
+    code: P40/100
+    description: "{element_type} – {name}"
+    quantity: length
+  IfcPipeFitting:
+    element_type: Pipe Fitting
+    unit: piece
+    code: P10/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcDuctFitting:
+    element_type: Duct Fitting
+    unit: piece
+    code: P30/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcValve:
+    element_type: Valve
+    unit: piece
+    code: P10/300
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcFlowController:
+    element_type: Flow Controller
+    unit: piece
+    code: P20/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcFlowFitting:
+    element_type: Flow Fitting
+    unit: piece
+    code: P20/300
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcSanitaryTerminal:
+    element_type: Sanitary Fixture
+    unit: piece
+    code: Q30/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcLightFixture:
+    element_type: Light Fixture
+    unit: piece
+    code: L10/200
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcOutlet:
+    element_type: Outlet
+    unit: piece
+    code: L10/300
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcSwitchingDevice:
+    element_type: Switch
+    unit: piece
+    code: L10/400
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcElectricDistributionBoard:
+    element_type: Distribution Board
+    unit: piece
+    code: L10/500
+    description: "{element_type} – {name}"
+    quantity: count
+  IfcDistributionFlowElement:
+    element_type: Distribution Element
+    unit: piece
+    description: "{element_type} – {name}"
+    quantity: count
+
+# Specific overrides by type/name
+overrides:
+  - ifc_class: IfcSlab
+    ifc_type: ROOF
+    element_type: Roof
+    unit: m2
+    code: F30/300
+    description: "Roof – {name}"
+
+  - ifc_class: IfcCovering
+    name_contains: tile
+    element_type: Tiling
+    unit: m2
+    code: Q30/100

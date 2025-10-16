@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.api.deps import current_user
 from app.db.session import get_db
 from app.models.job import Job
 from app.models.boq_item import BoqItem
@@ -11,7 +12,7 @@ router = APIRouter()
 
 
 @router.get("/{id}/takeoff", response_model=List[BoqItemOut])
-def get_takeoff(id: str, db: Session = Depends(get_db)):
+def get_takeoff(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     j = db.query(Job).get(id)
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -20,7 +21,7 @@ def get_takeoff(id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}/mapping")
-def patch_mapping(id: str, payload: MappingPatchRequest, db: Session = Depends(get_db)):
+def patch_mapping(id: str, payload: MappingPatchRequest, user=Depends(current_user), db: Session = Depends(get_db)):
     j = db.query(Job).get(id)
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")

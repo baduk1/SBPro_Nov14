@@ -1,20 +1,26 @@
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # App
+    # API
     API_V1_PREFIX: str = "/api/v1"
-    SECRET_KEY: str = "CHANGE_ME_SUPER_SECRET"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+
+    # Security
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "")  # must be set in env for staging/prod
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", str(60 * 24)))
 
     # CORS
+    USER_APP_ORIGIN: Optional[str] = os.getenv("USER_APP_ORIGIN")
+    ADMIN_APP_ORIGIN: Optional[str] = os.getenv("ADMIN_APP_ORIGIN")
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
     ]
 
     # Database & storage
@@ -22,6 +28,21 @@ class Settings(BaseSettings):
     STORAGE_DIR: str = os.getenv("STORAGE_DIR", "./storage")
     DEFAULT_CURRENCY: str = os.getenv("DEFAULT_CURRENCY", "GBP")
     DEFAULT_REGION: str = os.getenv("DEFAULT_REGION", "UK")
+
+    # Presign/HMAC
+    PRESIGN_DEFAULT_TTL_SECONDS: int = int(os.getenv("PRESIGN_DEFAULT_TTL_SECONDS", "900"))  # 15 min
+    PRESIGN_CLOCK_SKEW_SECONDS: int = int(os.getenv("PRESIGN_CLOCK_SKEW_SECONDS", "30"))
+
+    # Engines & mapping
+    MAPPING_FILE: str = os.getenv("MAPPING_FILE", "storage/config/mapping.yml")
+    ENABLE_PDF_PLAN_ENGINE: bool = os.getenv("ENABLE_PDF_PLAN_ENGINE", "true").lower() == "true"
+    OCR_LANGS: str = os.getenv("OCR_LANGS", "rus+eng")
+
+    # Backups
+    BACKUP_DIR: str = os.getenv("BACKUP_DIR", "./backups")
+
+    # Upload whitelist
+    ALLOWED_UPLOAD_TYPES: List[str] = ["IFC", "DWG", "DXF", "PDF"]
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

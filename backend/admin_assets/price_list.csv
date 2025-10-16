@@ -1,0 +1,26 @@
+code,description,unit,rate
+E10/100,Walls,m2,44.80
+F10/100,Floors,m2,33.70
+E20/200,Columns,m3,248.00
+E20/300,Beams,m3,232.00
+F30/100,Finish (covering),m2,22.40
+F30/300,Roof,m2,39.50
+L10/100,Door,piece,118.00
+L10/200,Window,piece,182.00
+L10/210,Light fixture,piece,41.00
+L10/300,Outlet,piece,18.00
+L10/400,Switch,piece,15.00
+L10/500,Distribution Board,piece,248.00
+L10/520,Terminal Board (TTB),piece,126.00
+P10/100,Pipe Run,m,12.50
+P10/300,Valve,piece,29.00
+P20/200,Flow Controller,piece,26.00
+P20/300,Flow Fitting,piece,4.20
+P30/100,Duct Run,m,18.00
+P30/200,Duct Fitting,piece,8.40
+P40/100,Cable Run,m,2.20
+Q30/100,Tiling,m2,30.00
+Q30/200,Sanitary Fixture,piece,76.00
+E40/100,Stair,piece,600.00
+A20/110,Appliance – Refrigerator,piece,310.00
+A20/120,Appliance – Range,piece,280.00

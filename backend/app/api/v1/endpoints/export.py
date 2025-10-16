@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.api.deps import current_user
 from app.db.session import get_db
 from app.models.job import Job
 from app.models.artifact import Artifact
@@ -12,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/{id}/export", response_model=ArtifactOut)
-def export_boq(id: str, format: str = "csv", db: Session = Depends(get_db)):
+def export_boq(id: str, format: str = "csv", user=Depends(current_user), db: Session = Depends(get_db)):
     j = db.query(Job).get(id)
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -28,5 +29,5 @@ def export_boq(id: str, format: str = "csv", db: Session = Depends(get_db)):
 
 
 @router.get("/{id}/artifacts", response_model=List[ArtifactOut])
-def list_artifacts(id: str, db: Session = Depends(get_db)):
+def list_artifacts(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     return db.query(Artifact).filter(Artifact.job_id == id).all()

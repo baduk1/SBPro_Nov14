@@ -1,0 +1,10 @@
+code,description,unit,rate,currency
+PIP,Pipe run,m,12.50,GBP
+CAB,Cable run,m,2.20,GBP
+FIX-SAN,Sanitary fixture,item,75,GBP
+LUM,Light fixture,item,40,GBP
+SW,Switch,item,15,GBP
+OUT,Socket outlet,item,18,GBP
+DB,Distribution board,item,250,GBP
+VAL,Valve,item,30,GBP
+FIT-P,Pipe fitting,item,6,GBP
