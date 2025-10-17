@@ -365,4 +365,4 @@ POST   /api/v1/auth/verify-email
 ---
 
 *Обновлено: 2025-10-07*
-*Автор: Claude Code (Anthropic)*
+*Автор: George Mikadze*

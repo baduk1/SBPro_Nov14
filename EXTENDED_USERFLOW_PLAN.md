@@ -1852,5 +1852,5 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
 
 *План создан: 2025-10-03*
 *Обновлен: 2025-10-07 (v2.0 - Custdev-Focused MVP)*
-*Авторы: Claude (Anthropic) + SuperGrok Heavy analysis*
+*Автор: George Mikadze*
 *Статус: Ready for implementation*
