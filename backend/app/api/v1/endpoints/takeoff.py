@@ -13,7 +13,9 @@ router = APIRouter()
 
 @router.get("/{id}/takeoff", response_model=List[BoqItemOut])
 def get_takeoff(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
-    j = db.query(Job).get(id)
+    """Get takeoff BOQ items - ownership verified"""
+    # CRITICAL: Verify job ownership before returning BOQ
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
     items = db.query(BoqItem).filter(BoqItem.job_id == id).all()
@@ -22,7 +24,9 @@ def get_takeoff(id: str, user=Depends(current_user), db: Session = Depends(get_d
 
 @router.patch("/{id}/mapping")
 def patch_mapping(id: str, payload: MappingPatchRequest, user=Depends(current_user), db: Session = Depends(get_db)):
-    j = db.query(Job).get(id)
+    """Update BOQ mapping - ownership verified"""
+    # CRITICAL: Verify job ownership before modifying BOQ items
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
     updated = 0

@@ -11,6 +11,7 @@ from app.models.job import Job
 from app.models.job_event import JobEvent
 from app.models.boq_item import BoqItem
 from app.models.file import File
+from app.models.user import User
 from app.services.sse import broker
 from app.services.takeoff.ifc_validator import validate_ifc
 from app.services.storage import mapping_file_path
@@ -19,6 +20,22 @@ from app.services.takeoff.dwg_takeoff import run_dwg_takeoff
 from app.services.pricing import apply_prices as apply_prices_service
 from app.models.price_list import PriceList
 from app.core.config import settings
+
+
+def _refund_credits(db: Session, job: Job) -> None:
+    """
+    Refund credits to user when job processing fails.
+    CRITICAL: This ensures users don't lose credits on processing failures.
+    """
+    try:
+        user = db.query(User).filter(User.id == job.user_id).first()
+        if user:
+            user.credits_balance += settings.COST_PER_JOB
+            db.commit()
+            _emit(db, job.id, "refund", f"Credits refunded ({settings.COST_PER_JOB} credits)", progress=None)
+    except Exception as e:
+        # Log refund failure but don't crash
+        _emit(db, job.id, "error", f"Credit refund failed: {e}", progress=None)
 
 # Engines
 try:
@@ -74,8 +91,10 @@ def _emit(
 def process_job(job_id: str) -> None:
     """
     Background pipeline: Validation -> Parsing -> Take-off -> Save BoQ items.
+    Credits are refunded on any failure.
     """
     db = SessionLocal()
+    job = None
     try:
         job = db.query(Job).get(job_id)
         if not job:
@@ -102,6 +121,8 @@ def process_job(job_id: str) -> None:
             job.finished_at = datetime.now(timezone.utc)
             db.commit()
             _emit(db, job_id, "error", "Validation failed")
+            # CRITICAL: Refund credits on validation failure
+            _refund_credits(db, job)
             return
         if warnings:
             _emit(db, job_id, "warnings", "; ".join(warnings))
@@ -144,6 +165,8 @@ def process_job(job_id: str) -> None:
             job.finished_at = datetime.now(timezone.utc)
             db.commit()
             _emit(db, job_id, "error", f"Take-off failed: {e}")
+            # CRITICAL: Refund credits on takeoff failure
+            _refund_credits(db, job)
             return
 
         # Persist BoQ items
@@ -176,5 +199,17 @@ def process_job(job_id: str) -> None:
         job.finished_at = datetime.now(timezone.utc)
         db.commit()
         _emit(db, job_id, "completed", "Job finished", progress=100)
+    except Exception as e:
+        # CRITICAL: Catch any unexpected errors and refund credits
+        if job:
+            try:
+                job.status = "failed"
+                job.error_code = "unexpected_error"
+                job.finished_at = datetime.now(timezone.utc)
+                db.commit()
+                _emit(db, job_id, "error", f"Unexpected error: {e}")
+                _refund_credits(db, job)
+            except:
+                pass  # Best effort refund
     finally:
         db.close()

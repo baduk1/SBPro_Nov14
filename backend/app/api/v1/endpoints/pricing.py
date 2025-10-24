@@ -29,13 +29,14 @@ def apply_prices_endpoint(
     db: Session = Depends(get_db)
 ):
     """
-    Apply prices to job's takeoff items.
+    Apply prices to job's takeoff items - ownership verified.
 
     - If supplier_id is provided: Use supplier's price items (NEW)
     - If price_list_id is provided: Use admin price list (OLD, backward compatible)
     - If neither: Try to find default supplier, fallback to active admin price list
     """
-    j = db.query(Job).get(id)
+    # CRITICAL: Verify job ownership before modifying prices
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
 
@@ -122,4 +123,10 @@ def apply_prices_endpoint(
 
 @router.get("/{id}/boq", response_model=List[BoqItemOut])
 def get_boq(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
+    """Get BOQ items for a job - ownership verified"""
+    # CRITICAL: Verify job ownership first
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
+    if not j:
+        raise HTTPException(status_code=404, detail="Job not found")
+
     return db.query(BoqItem).filter(BoqItem.job_id == id).all()

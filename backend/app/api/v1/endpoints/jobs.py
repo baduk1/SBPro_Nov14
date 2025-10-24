@@ -34,9 +34,8 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
             detail=f"Insufficient credits. Required: {job_cost}, Available: {user.credits_balance}"
         )
 
-    # Deduct credits immediately
+    # Deduct credits (will be committed with job creation atomically)
     user.credits_balance -= job_cost
-    db.commit()
 
     # pick active price list if not provided
     price_list_id = payload.price_list_id
@@ -44,6 +43,7 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
         pl = db.query(PriceList).filter(PriceList.is_active == True).order_by(PriceList.effective_from.desc().nullslast()).first()  # noqa: E712
         price_list_id = pl.id if pl else None
 
+    # Create job - this commits credits deduction and job creation atomically
     j = Job(
         project_id=payload.project_id,
         user_id=user.id,
@@ -53,8 +53,17 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
         price_list_id=price_list_id,
     )
     db.add(j)
-    db.commit()
-    db.refresh(j)
+
+    try:
+        # ATOMIC: Commit credits deduction + job creation together
+        db.commit()
+        db.refresh(j)
+    except Exception as e:
+        # Rollback on failure (credits and job not created)
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create job: {str(e)}")
+
+    # Queue background processing (refund will happen if processing fails)
     background.add_task(process_job, j.id)
     return j
 

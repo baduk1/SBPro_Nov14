@@ -14,7 +14,9 @@ router = APIRouter()
 
 @router.post("/{id}/export", response_model=ArtifactOut)
 def export_boq(id: str, format: str = "csv", user=Depends(current_user), db: Session = Depends(get_db)):
-    j = db.query(Job).get(id)
+    """Export BOQ - ownership verified"""
+    # CRITICAL: Verify job ownership before export
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
     if format == "csv":
@@ -30,4 +32,10 @@ def export_boq(id: str, format: str = "csv", user=Depends(current_user), db: Ses
 
 @router.get("/{id}/artifacts", response_model=List[ArtifactOut])
 def list_artifacts(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
+    """List artifacts for a job - ownership verified"""
+    # CRITICAL: Verify job ownership first
+    j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
+    if not j:
+        raise HTTPException(status_code=404, detail="Job not found")
+
     return db.query(Artifact).filter(Artifact.job_id == id).all()
