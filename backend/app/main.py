@@ -5,13 +5,20 @@ from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
 from app.api.v1.router import api_router
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.error_handler import register_error_handlers
 
 # Fail fast: SECRET_KEY must be set for staging/prod (and dev, если хочешь дисциплины)
 if not settings.SECRET_KEY or settings.SECRET_KEY.strip() in ("", "CHANGE_ME_SUPER_SECRET"):
     raise RuntimeError("SECRET_KEY must be set via env. Month-2 production foundation requires secure secrets.")
 
-# Create DB schema (dev). In production, use Alembic migrations.
-Base.metadata.create_all(bind=engine)
+# Create DB schema (dev only). In production, use migration scripts.
+if settings.ENV != "production":
+    Base.metadata.create_all(bind=engine)
+else:
+    # Production: migrations must be run manually
+    # Run: python migrate_add_registration.py && python migrate_add_templates_estimates.py
+    pass
 
 app = FastAPI(
     title="SkyBuild Pro API",
@@ -35,6 +42,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add rate limiting (100 requests per minute per IP)
+app.add_middleware(RateLimitMiddleware, calls=100, period=60)
+
+# Register error handlers
+register_error_handlers(app)
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 

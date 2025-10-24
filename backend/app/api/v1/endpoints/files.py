@@ -63,8 +63,8 @@ async def upload_content(
 
 @router.get("/{file_id}", response_model=FileOut)
 def get_file(file_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    f = db.query(File).get(file_id)
+    """Get file metadata - ownership verified"""
+    f = db.query(File).filter(File.id == file_id, File.user_id == user.id).first()
     if not f:
         raise HTTPException(status_code=404, detail="File not found")
-    # Optionally: check ownership/project membership here
     return f

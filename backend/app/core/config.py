@@ -5,6 +5,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # Environment
+    ENV: str = os.getenv("ENV", "development")  # development | production
+
     # API
     API_V1_PREFIX: str = "/api/v1"
 
@@ -43,6 +46,18 @@ class Settings(BaseSettings):
 
     # Upload whitelist
     ALLOWED_UPLOAD_TYPES: List[str] = ["IFC", "DWG", "DXF", "PDF"]
+
+    # Credits & Billing
+    COST_PER_JOB: int = int(os.getenv("COST_PER_JOB", "200"))  # Credits to deduct per job
+
+    # Email Configuration
+    SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: Optional[str] = os.getenv("SMTP_USER")
+    SMTP_PASSWORD: Optional[str] = os.getenv("SMTP_PASSWORD")
+    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "noreply@skybuild.io")
+    SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "SkyBuild Pro")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

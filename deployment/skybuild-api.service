@@ -1,0 +1,88 @@
+# ============================================================================
+# SkyBuild Pro - Systemd Service Configuration
+# ============================================================================
+# Installation:
+# 1. Copy to /etc/systemd/system/skybuild-api.service
+# 2. Reload systemd: systemctl daemon-reload
+# 3. Enable on boot: systemctl enable skybuild-api
+# 4. Start service: systemctl start skybuild-api
+# 5. Check status: systemctl status skybuild-api
+# 6. View logs: journalctl -u skybuild-api -f
+# ============================================================================
+
+[Unit]
+Description=SkyBuild Pro API Server
+After=network.target postgresql.service
+Requires=network.target
+
+[Service]
+Type=notify
+User=skybuild
+Group=skybuild
+WorkingDirectory=/opt/skybuild/backend
+
+# Environment file with production configuration
+EnvironmentFile=/opt/skybuild/backend/.env
+
+# Start command using Gunicorn with Uvicorn workers
+ExecStart=/opt/skybuild/backend/venv/bin/gunicorn \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --workers 4 \
+    --worker-connections 1000 \
+    --bind 127.0.0.1:8000 \
+    --timeout 300 \
+    --graceful-timeout 30 \
+    --keep-alive 5 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --access-logfile /var/log/skybuild/access.log \
+    --error-logfile /var/log/skybuild/error.log \
+    --log-level info \
+    --pid /run/skybuild/api.pid \
+    app.main:app
+
+# Graceful shutdown
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/skybuild/storage /opt/skybuild/backups /var/log/skybuild /run/skybuild
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=512
+
+# Runtime directory
+RuntimeDirectory=skybuild
+RuntimeDirectoryMode=0755
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=skybuild-api
+
+[Install]
+WantedBy=multi-user.target
+
+# ============================================================================
+# NOTES:
+# ============================================================================
+# 1. Create skybuild user: useradd -r -s /bin/false -d /opt/skybuild skybuild
+# 2. Create log directory: mkdir -p /var/log/skybuild && chown skybuild:skybuild /var/log/skybuild
+# 3. Set ownership: chown -R skybuild:skybuild /opt/skybuild
+# 4. Adjust --workers based on CPU cores (recommended: 2-4 x CPU cores)
+# 5. Monitor with: journalctl -u skybuild-api -f
+# 6. Check resource usage: systemctl status skybuild-api
+# ============================================================================
