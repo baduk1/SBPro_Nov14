@@ -36,3 +36,26 @@ apps/*/.vite/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Documentation (exclude temporary/session files)
+SESSION_LOG*.md
+WORK_PROGRESS*.md
+STATE_OF_PROJECT*.md
+COMPREHENSIVE_AUDIT*.md
+IMPLEMENTATION_PROGRESS*.md
+PROJECT_STATUS_2025-*.md
+REGISTRATION_SYSTEM*.md
+SUPERGROK*.md
+GPT5*.md
+CLAUDE*.md
+HOW_TO_USE_GPT5*.md
+РЕЗЮМЕ*.md
+ПОЛНАЯ*.md
+state_of_commit*.md
+SYNC_COMPLETED*.md
+FINAL_SYNC_REPORT.md
+CURRENT_STATUS*.md
+
+# Storage
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
