@@ -33,16 +33,17 @@
 **Fix:**
 1. Make sure user is logged in - check browser DevTools → Application → Local Storage → `token` key exists
 
-2. If no token, sign in first:
-   - Go to `/app/signin`
-   - Use credentials: `admin@example.com` / `admin123`
-   - OR use demo mode: email `test` + any password (check if SignIn page shows demo mode banner)
-
-3. Seed admin user if needed (backend must be running):
+2. If no token, create admin user first:
    ```bash
-   curl -X POST http://localhost:8000/api/v1/auth/seed-admin
-   # Response: {"created":true,"email":"admin@example.com","password":"admin123"}
+   cd backend
+   python create_admin_user.py
+   # Enter email and secure password (uses getpass - no echo)
    ```
+
+3. Then sign in:
+   - Go to `/app/signin`
+   - Use your admin credentials from step 2
+   - OR use demo mode: email `test` + any password (check if SignIn page shows demo mode banner)
 
 ---
 
@@ -120,9 +121,10 @@
 
 1. **Login test:**
    ```bash
+   # Replace YOUR_EMAIL and YOUR_PASSWORD with your admin credentials
    curl -X POST http://localhost:8000/api/v1/auth/login \
      -H "Content-Type: application/x-www-form-urlencoded" \
-     -d "username=admin@example.com&password=admin123"
+     -d "username=YOUR_EMAIL&password=YOUR_PASSWORD"
    # Should return: {"access_token":"..."}
    ```
 
@@ -168,14 +170,15 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
 # 4. Wait 2 seconds
 sleep 2
 
-# 5. Seed admin
-curl -X POST http://localhost:8000/api/v1/auth/seed-admin
+# 5. Create admin user (if not exists)
+python create_admin_user.py
+# Enter email and password securely
 
 # 6. Start frontend
 cd ../apps/user-frontend
 npm run dev
 
-# 7. Open browser, sign in with admin@example.com / admin123
+# 7. Open browser, sign in with your admin credentials
 ```
 
 ---

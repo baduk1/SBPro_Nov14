@@ -12,14 +12,18 @@ This guide explains how to configure mappings & price lists and run an end‑to�
   - Optional: `USER_APP_ORIGIN` and `ADMIN_APP_ORIGIN` for CORS.
 - Python deps: see `backend/requirements.txt` (includes `ifcopenshell`, `ezdxf`, `pandas`, etc.).
 
-Seed the first admin (one‑time):
+**Create the first admin** (one‑time, run from backend directory):
 
-```
-POST /api/v1/auth/seed-admin
-→ { email: "admin@example.com", password: "admin123" }
+```bash
+cd backend
+python create_admin_user.py
+# Enter admin email and password securely (using getpass)
 ```
 
 Use these credentials in the **admin-frontend** to sign in.
+
+> **SECURITY NOTE**: Never use default credentials like "admin123" in production.
+> The `create_admin_user.py` script ensures secure password input without logging.
 
 ---
 
