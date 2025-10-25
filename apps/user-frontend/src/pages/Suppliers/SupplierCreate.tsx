@@ -11,12 +11,15 @@ import {
   Stack,
   Switch,
   TextField,
-  Typography
+  Typography,
+  Alert,
+  CircularProgress
 } from '@mui/material'
 import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon
 } from '@mui/icons-material'
+import { suppliers } from '../../services/api'
 
 export default function SupplierCreate() {
   const navigate = useNavigate()
@@ -25,12 +28,26 @@ export default function SupplierCreate() {
     contact_info: '',
     is_default: false
   })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock save - in real implementation would call API
-    alert('Supplier created successfully! (Mock)')
-    navigate('/app/suppliers')
+    setLoading(true)
+    setError(null)
+
+    try {
+      await suppliers.create({
+        name: formData.name,
+        contact_info: formData.contact_info || undefined,
+        is_default: formData.is_default
+      })
+      navigate('/app/suppliers')
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to create supplier')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -49,6 +66,13 @@ export default function SupplierCreate() {
           </Typography>
         </Box>
       </Stack>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
@@ -106,9 +130,10 @@ export default function SupplierCreate() {
           <Button
             type="submit"
             variant="contained"
-            startIcon={<SaveIcon />}
+            startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
+            disabled={loading || !formData.name}
           >
-            Create Supplier
+            {loading ? 'Creating...' : 'Create Supplier'}
           </Button>
         </Stack>
       </form>

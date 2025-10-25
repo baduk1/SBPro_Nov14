@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Integer, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from uuid import uuid4
@@ -21,5 +21,12 @@ class User(Base):
     hash = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    # Registration & Credits
+    email_verified = Column(Boolean, default=False, nullable=False)
+    credits_balance = Column(Integer, default=2000, nullable=False)  # Free trial: 2000 credits
+    full_name = Column(String, nullable=True)
+
     # Relationships
     suppliers = relationship("Supplier", back_populates="user")
+    templates = relationship("Template", backref="user")
+    estimates = relationship("Estimate", backref="user")

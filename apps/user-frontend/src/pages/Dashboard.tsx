@@ -7,14 +7,16 @@ import {
   Receipt as ReceiptIcon,
   CloudUpload as CloudUploadIcon,
   History as HistoryIcon,
-  Share as ShareIcon
+  Share as ShareIcon,
+  AccountBalance as CreditsIcon
 } from '@mui/icons-material'
-import { jobs, Job } from '../services/api'
-import { mockSuppliers, mockTemplates, mockEstimates } from '../mocks/mockData'
+import { jobs, Job, suppliers, auth, User } from '../services/api'
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [items, setItems] = useState<Job[]>([])
+  const [suppliersCount, setSuppliersCount] = useState<number>(0)
+  const [user, setUser] = useState<User | null>(null)
   const [snackbar, setSnackbar] = useState({ open: false, message: '' })
 
   const handleShare = (jobId: string) => {
@@ -27,6 +29,14 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    // Check if user has completed onboarding
+    const onboardingComplete = localStorage.getItem('onboarding_complete')
+    if (!onboardingComplete) {
+      // Redirect to onboarding for new users
+      navigate('/onboarding')
+      return
+    }
+
     let alive = true
     const load = async () => {
       try {
@@ -34,29 +44,43 @@ export default function Dashboard() {
         if (alive) setItems(data)
       } catch {/* ignore */}
     }
+    const loadSuppliers = async () => {
+      try {
+        const data = await suppliers.list()
+        if (alive) setSuppliersCount(data.length)
+      } catch {/* ignore */}
+    }
+    const loadUser = async () => {
+      try {
+        const data = await auth.me()
+        if (alive) setUser(data)
+      } catch {/* ignore */}
+    }
     load()
+    loadSuppliers()
+    loadUser()
     const t = setInterval(load, 5000)
     return ()=>{ alive = false; clearInterval(t) }
-  }, [])
+  }, [navigate])
 
   const quickActions = [
     {
       title: 'Suppliers',
-      description: `${mockSuppliers.length} suppliers`,
+      description: suppliersCount > 0 ? `${suppliersCount} suppliers` : 'Manage suppliers',
       icon: <BusinessIcon sx={{ fontSize: 40 }} color="primary" />,
       link: '/app/suppliers',
       color: '#1976d2'
     },
     {
       title: 'Templates',
-      description: `${mockTemplates.length} templates`,
+      description: 'Reusable BoQ templates',
       icon: <DescriptionIcon sx={{ fontSize: 40 }} color="success" />,
       link: '/app/templates',
       color: '#2e7d32'
     },
     {
       title: 'Estimates',
-      description: `${mockEstimates.length} estimates`,
+      description: 'Cost estimates',
       icon: <ReceiptIcon sx={{ fontSize: 40 }} color="warning" />,
       link: '/app/estimates',
       color: '#ed6c02'
@@ -72,10 +96,23 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 1 }}>Dashboard</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-        Welcome back! Here's your project overview
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ mb: 1 }}>Dashboard</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Welcome back{user?.full_name ? `, ${user.full_name}` : ''}! Here's your project overview
+          </Typography>
+        </Box>
+        {user && (
+          <Chip
+            icon={<CreditsIcon />}
+            label={`${user.credits_balance.toLocaleString()} Credits`}
+            color={user.credits_balance < 500 ? 'warning' : 'success'}
+            sx={{ fontWeight: 600, fontSize: '1rem', py: 2.5, px: 1 }}
+          />
+        )}
+      </Box>
+      <Box sx={{ mb: 4 }} />
 
       {/* Quick Actions Grid */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

@@ -10,6 +10,9 @@ from app.api.v1.endpoints import (
     export,
     artifacts,
     suppliers,
+    templates,
+    estimates,
+    billing,
     admin_price,
     admin_mapping,
     admin_access_requests,
@@ -26,6 +29,9 @@ api_router.include_router(pricing.router, prefix="/jobs", tags=["Pricing"])
 api_router.include_router(export.router, prefix="/jobs", tags=["Export/Artifacts"])
 api_router.include_router(artifacts.router, prefix="/artifacts", tags=["Artifacts"])
 api_router.include_router(suppliers.router, prefix="/suppliers", tags=["Suppliers"])
+api_router.include_router(templates.router, prefix="/templates", tags=["Templates"])
+api_router.include_router(estimates.router, prefix="/estimates", tags=["Estimates"])
+api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(admin_price.router, prefix="/admin")
 api_router.include_router(admin_mapping.router, prefix="/admin")
 api_router.include_router(admin_access_requests.router, prefix="/admin")

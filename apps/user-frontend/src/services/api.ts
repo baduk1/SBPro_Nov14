@@ -59,6 +59,16 @@ export interface Artifact {
   checksum?: string | null
 }
 
+// User types
+export interface User {
+  id: string
+  email: string
+  role: string
+  email_verified: boolean
+  credits_balance: number
+  full_name?: string
+}
+
 // ===== Endpoint wrappers =====
 export const auth = {
   login: async (email: string, password: string) => {
@@ -67,6 +77,30 @@ export const auth = {
     data.append('password', password)
     const res = await api.post('/auth/login', data, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     return res.data as { access_token: string }
+  },
+  register: async (email: string, password: string, fullName?: string) => {
+    const res = await api.post<User>('/auth/register', {
+      email,
+      password,
+      full_name: fullName
+    })
+    return res.data
+  },
+  verifyEmail: async (token: string) => {
+    const res = await api.post<{ message: string; email: string }>('/auth/verify-email', null, {
+      params: { token }
+    })
+    return res.data
+  },
+  resendVerification: async (email: string) => {
+    const res = await api.post<{ message: string; email: string }>('/auth/resend-verification', null, {
+      params: { email }
+    })
+    return res.data
+  },
+  me: async () => {
+    const res = await api.get<User>('/auth/me')
+    return res.data
   },
 }
 
@@ -192,6 +226,228 @@ export const suppliers = {
       { headers: { 'Content-Type': 'multipart/form-data' } }
     )
     return res.data
+  },
+}
+
+// Template types
+export interface TemplateItem {
+  id: string
+  template_id: string
+  element_type: string
+  description?: string
+  unit: string
+  default_unit_price?: number
+  default_currency?: string
+  quantity_multiplier: number
+  sort_order: number
+  created_at: string
+}
+
+export interface Template {
+  id: string
+  user_id: string
+  name: string
+  description?: string
+  category?: string
+  is_default: boolean
+  created_at: string
+  updated_at?: string
+  items: TemplateItem[]
+}
+
+export interface TemplateListItem {
+  id: string
+  user_id: string
+  name: string
+  description?: string
+  category?: string
+  is_default: boolean
+  created_at: string
+  updated_at?: string
+  items_count: number
+}
+
+export const templates = {
+  list: async () => {
+    const res = await api.get<TemplateListItem[]>('/templates')
+    return res.data
+  },
+  get: async (id: string) => {
+    const res = await api.get<Template>(`/templates/${id}`)
+    return res.data
+  },
+  create: async (data: {
+    name: string
+    description?: string
+    category?: string
+    is_default?: boolean
+    items: Omit<TemplateItem, 'id' | 'template_id' | 'created_at'>[]
+  }) => {
+    const res = await api.post<Template>('/templates', data)
+    return res.data
+  },
+  update: async (id: string, data: {
+    name?: string
+    description?: string
+    category?: string
+    is_default?: boolean
+  }) => {
+    const res = await api.patch<Template>(`/templates/${id}`, data)
+    return res.data
+  },
+  delete: async (id: string) => {
+    await api.delete(`/templates/${id}`)
+  },
+  listItems: async (id: string) => {
+    const res = await api.get<TemplateItem[]>(`/templates/${id}/items`)
+    return res.data
+  },
+  createItem: async (id: string, data: Omit<TemplateItem, 'id' | 'template_id' | 'created_at'>) => {
+    const res = await api.post<TemplateItem>(`/templates/${id}/items`, data)
+    return res.data
+  },
+  updateItem: async (id: string, itemId: string, data: Partial<Omit<TemplateItem, 'id' | 'template_id' | 'created_at'>>) => {
+    const res = await api.patch<TemplateItem>(`/templates/${id}/items/${itemId}`, data)
+    return res.data
+  },
+  deleteItem: async (id: string, itemId: string) => {
+    await api.delete(`/templates/${id}/items/${itemId}`)
+  },
+  apply: async (templateId: string, jobId: string) => {
+    const res = await api.post<{ message: string; applied_count: number; total_items: number }>(
+      '/templates/apply',
+      { template_id: templateId, job_id: jobId }
+    )
+    return res.data
+  },
+}
+
+// Estimate types
+export interface CostAdjustment {
+  id: string
+  estimate_id: string
+  name: string
+  adjustment_type: 'percentage' | 'fixed'
+  value: number
+  amount: number
+  sort_order: number
+  created_at: string
+}
+
+export interface EstimateItem {
+  id: string
+  estimate_id: string
+  boq_item_id?: string
+  description: string
+  element_type?: string
+  unit: string
+  quantity: number
+  unit_price: number
+  total_price: number
+  currency: string
+  notes?: string
+  sort_order: number
+  created_at: string
+}
+
+export interface Estimate {
+  id: string
+  user_id: string
+  job_id?: string
+  project_id?: string
+  name: string
+  description?: string
+  subtotal: number
+  total: number
+  currency: string
+  notes?: string
+  tags?: string[]
+  created_at: string
+  updated_at?: string
+  items: EstimateItem[]
+  adjustments: CostAdjustment[]
+}
+
+export interface EstimateListItem {
+  id: string
+  user_id: string
+  job_id?: string
+  project_id?: string
+  name: string
+  description?: string
+  subtotal: number
+  total: number
+  currency: string
+  created_at: string
+  updated_at?: string
+  items_count: number
+}
+
+export const estimates = {
+  list: async () => {
+    const res = await api.get<EstimateListItem[]>('/estimates')
+    return res.data
+  },
+  get: async (id: string) => {
+    const res = await api.get<Estimate>(`/estimates/${id}`)
+    return res.data
+  },
+  create: async (data: {
+    name: string
+    description?: string
+    job_id?: string
+    project_id?: string
+    currency?: string
+    notes?: string
+    tags?: string[]
+    items: Omit<EstimateItem, 'id' | 'estimate_id' | 'total_price' | 'created_at'>[]
+    adjustments: Omit<CostAdjustment, 'id' | 'estimate_id' | 'amount' | 'created_at'>[]
+  }) => {
+    const res = await api.post<Estimate>('/estimates', data)
+    return res.data
+  },
+  update: async (id: string, data: {
+    name?: string
+    description?: string
+    currency?: string
+    notes?: string
+    tags?: string[]
+  }) => {
+    const res = await api.patch<Estimate>(`/estimates/${id}`, data)
+    return res.data
+  },
+  delete: async (id: string) => {
+    await api.delete(`/estimates/${id}`)
+  },
+  listItems: async (id: string) => {
+    const res = await api.get<EstimateItem[]>(`/estimates/${id}/items`)
+    return res.data
+  },
+  createItem: async (id: string, data: Omit<EstimateItem, 'id' | 'estimate_id' | 'total_price' | 'created_at'>) => {
+    const res = await api.post<EstimateItem>(`/estimates/${id}/items`, data)
+    return res.data
+  },
+  updateItem: async (id: string, itemId: string, data: Partial<Omit<EstimateItem, 'id' | 'estimate_id' | 'total_price' | 'created_at'>>) => {
+    const res = await api.patch<EstimateItem>(`/estimates/${id}/items/${itemId}`, data)
+    return res.data
+  },
+  deleteItem: async (id: string, itemId: string) => {
+    await api.delete(`/estimates/${id}/items/${itemId}`)
+  },
+  listAdjustments: async (id: string) => {
+    const res = await api.get<CostAdjustment[]>(`/estimates/${id}/adjustments`)
+    return res.data
+  },
+  createAdjustment: async (id: string, data: Omit<CostAdjustment, 'id' | 'estimate_id' | 'amount' | 'created_at'>) => {
+    const res = await api.post<CostAdjustment>(`/estimates/${id}/adjustments`, data)
+    return res.data
+  },
+  updateAdjustment: async (id: string, adjId: string, data: Partial<Omit<CostAdjustment, 'id' | 'estimate_id' | 'amount' | 'created_at'>>) => {
+    const res = await api.patch<CostAdjustment>(`/estimates/${id}/adjustments/${adjId}`, data)
+    return res.data
+  },
+  deleteAdjustment: async (id: string, adjId: string) => {
+    await api.delete(`/estimates/${id}/adjustments/${adjId}`)
   },
 }
 

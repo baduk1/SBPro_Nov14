@@ -4,10 +4,13 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline } from '@mui/material'
 
-import Landing from './pages/Landing'
+import LandingNew from './pages/LandingNew'
 import Shell from './App'
 import Dashboard from './pages/Dashboard'
 import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import VerifyEmail from './pages/VerifyEmail'
+import Onboarding from './pages/Onboarding'
 import Upload from './pages/Upload'
 import JobStatus from './pages/JobStatus'
 import TakeoffPreview from './pages/TakeoffPreview'
@@ -16,16 +19,18 @@ import TakeoffPreview from './pages/TakeoffPreview'
 import SuppliersList from './pages/Suppliers/SuppliersList'
 import SupplierDetails from './pages/Suppliers/SupplierDetails'
 import SupplierCreate from './pages/Suppliers/SupplierCreate'
-import TemplatesList from './pages/Templates/TemplatesList'
-import TemplateDetails from './pages/Templates/TemplateDetails'
-import EstimatesList from './pages/Estimates/EstimatesList'
-import EstimateDetails from './pages/Estimates/EstimateDetails'
+import TemplatesListNew from './pages/Templates/TemplatesListNew'
+import TemplateDetailsNew from './pages/Templates/TemplateDetailsNew'
+import EstimatesListNew from './pages/Estimates/EstimatesListNew'
+import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
 
 import { ColorModeProvider } from './hooks/useColorMode'
 
 const router = createBrowserRouter([
-  { path: '/', element: <Landing /> },
+  { path: '/', element: <LandingNew /> },
+  { path: '/verify-email', element: <VerifyEmail /> },
+  { path: '/onboarding', element: <Onboarding /> },
   {
     path: '/app',
     element: <Shell />,
@@ -33,6 +38,7 @@ const router = createBrowserRouter([
       { path: '', element: <Navigate to="dashboard" /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'signin', element: <SignIn /> },
+      { path: 'signup', element: <SignUp /> },
       { path: 'upload', element: <Upload /> },
       { path: 'jobs/:id', element: <JobStatus /> },
       { path: 'jobs/:id/takeoff', element: <TakeoffPreview /> },
@@ -43,12 +49,12 @@ const router = createBrowserRouter([
       { path: 'suppliers/:id', element: <SupplierDetails /> },
 
       // Templates
-      { path: 'templates', element: <TemplatesList /> },
-      { path: 'templates/:id', element: <TemplateDetails /> },
+      { path: 'templates', element: <TemplatesListNew /> },
+      { path: 'templates/:id', element: <TemplateDetailsNew /> },
 
       // Estimates
-      { path: 'estimates', element: <EstimatesList /> },
-      { path: 'estimates/:id', element: <EstimateDetails /> },
+      { path: 'estimates', element: <EstimatesListNew /> },
+      { path: 'estimates/:id', element: <EstimateDetailsNew /> },
 
       // Projects
       { path: 'projects/:id/history', element: <ProjectHistory /> },

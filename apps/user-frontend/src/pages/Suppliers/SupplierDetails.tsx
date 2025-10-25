@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -19,7 +19,15 @@ import {
   Typography,
   Paper,
   Tabs,
-  Tab
+  Tab,
+  CircularProgress,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControlLabel,
+  Switch
 } from '@mui/material'
 import {
   ArrowBack as ArrowBackIcon,
@@ -29,7 +37,7 @@ import {
   Star as StarIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material'
-import { mockSuppliers, mockSupplierPriceItems } from '../../mocks/mockData'
+import { suppliers, Supplier, SupplierPriceItem } from '../../services/api'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -51,19 +59,151 @@ export default function SupplierDetails() {
   const navigate = useNavigate()
   const [tabValue, setTabValue] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [supplier, setSupplier] = useState<Supplier | null>(null)
+  const [priceItems, setPriceItems] = useState<SupplierPriceItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [itemDialogOpen, setItemDialogOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<SupplierPriceItem | null>(null)
+  const [itemForm, setItemForm] = useState({
+    code: '',
+    description: '',
+    unit: '',
+    price: '',
+    currency: 'GBP',
+    is_active: true
+  })
 
-  const supplier = mockSuppliers.find(s => s.id === id)
-  const priceItems = mockSupplierPriceItems.filter(item => item.supplier_id === id)
+  useEffect(() => {
+    loadData()
+  }, [id])
+
+  const loadData = async () => {
+    if (!id) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const [supplierData, itemsData] = await Promise.all([
+        suppliers.get(id),
+        suppliers.listPriceItems(id)
+      ])
+      setSupplier(supplierData)
+      setPriceItems(itemsData)
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to load supplier')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleImportCSV = async () => {
+    if (!csvFile || !id) return
+
+    setImporting(true)
+    try {
+      const result = await suppliers.importPriceItems(id, csvFile)
+      alert(`Imported ${result.imported_count} items. Skipped: ${result.skipped_count}`)
+      setImportDialogOpen(false)
+      setCsvFile(null)
+      loadData() // Reload price items
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || 'Import failed')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!id || !confirm('Delete this price item?')) return
+
+    try {
+      await suppliers.deletePriceItem(id, itemId)
+      setPriceItems(priceItems.filter(item => item.id !== itemId))
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || 'Failed to delete item')
+    }
+  }
+
+  const openItemDialog = (item?: SupplierPriceItem) => {
+    if (item) {
+      setEditingItem(item)
+      setItemForm({
+        code: item.code,
+        description: item.description,
+        unit: item.unit,
+        price: (item.price / 100).toFixed(2), // Convert from minor units
+        currency: item.currency,
+        is_active: item.is_active
+      })
+    } else {
+      setEditingItem(null)
+      setItemForm({
+        code: '',
+        description: '',
+        unit: '',
+        price: '',
+        currency: 'GBP',
+        is_active: true
+      })
+    }
+    setItemDialogOpen(true)
+  }
+
+  const handleSaveItem = async () => {
+    if (!id) return
+
+    try {
+      const priceFloat = parseFloat(itemForm.price)
+      if (isNaN(priceFloat)) {
+        alert('Invalid price')
+        return
+      }
+
+      const payload = {
+        code: itemForm.code,
+        description: itemForm.description,
+        unit: itemForm.unit,
+        price: Math.round(priceFloat * 100), // Convert to minor units
+        currency: itemForm.currency,
+        is_active: itemForm.is_active
+      }
+
+      if (editingItem) {
+        const updated = await suppliers.updatePriceItem(id, editingItem.id, payload)
+        setPriceItems(priceItems.map(item => item.id === editingItem.id ? updated : item))
+      } else {
+        const created = await suppliers.createPriceItem(id, payload)
+        setPriceItems([...priceItems, created])
+      }
+
+      setItemDialogOpen(false)
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || 'Failed to save item')
+    }
+  }
 
   const filteredItems = priceItems.filter(item =>
     item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  if (!supplier) {
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    )
+  }
+
+  if (error || !supplier) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography>Supplier not found</Typography>
+        <Alert severity="error">{error || 'Supplier not found'}</Alert>
       </Container>
     )
   }
@@ -142,14 +282,14 @@ export default function SupplierDetails() {
             <Button
               variant="outlined"
               startIcon={<FileUploadIcon />}
-              onClick={() => alert('Import CSV functionality - to be implemented')}
+              onClick={() => setImportDialogOpen(true)}
             >
               Import CSV
             </Button>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => alert('Add price item functionality - to be implemented')}
+              onClick={() => openItemDialog()}
             >
               Add Item
             </Button>
@@ -194,14 +334,14 @@ export default function SupplierDetails() {
                     <Stack direction="row" spacing={0.5} justifyContent="center">
                       <IconButton
                         size="small"
-                        onClick={() => alert('Edit item functionality - to be implemented')}
+                        onClick={() => openItemDialog(item)}
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => alert('Delete item functionality - to be implemented')}
+                        onClick={() => handleDeleteItem(item.id)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -230,6 +370,113 @@ export default function SupplierDetails() {
           </Typography>
         </Box>
       </TabPanel>
+
+      {/* Import CSV Dialog */}
+      <Dialog open={importDialogOpen} onClose={() => !importing && setImportDialogOpen(false)}>
+        <DialogTitle>Import Price Items from CSV</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Upload a CSV file with columns: code, description, unit, price, currency
+          </Typography>
+          <Button
+            variant="outlined"
+            component="label"
+            fullWidth
+          >
+            {csvFile ? csvFile.name : 'Choose CSV File'}
+            <input
+              type="file"
+              hidden
+              accept=".csv"
+              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+            />
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImportDialogOpen(false)} disabled={importing}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleImportCSV}
+            variant="contained"
+            disabled={!csvFile || importing}
+          >
+            {importing ? 'Importing...' : 'Import'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add/Edit Price Item Dialog */}
+      <Dialog open={itemDialogOpen} onClose={() => setItemDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingItem ? 'Edit Price Item' : 'Add Price Item'}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="Code"
+              required
+              fullWidth
+              value={itemForm.code}
+              onChange={(e) => setItemForm({ ...itemForm, code: e.target.value })}
+              placeholder="e.g. BRK-001"
+            />
+            <TextField
+              label="Description"
+              required
+              fullWidth
+              value={itemForm.description}
+              onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
+              placeholder="e.g. Standard Brick"
+            />
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Unit"
+                required
+                fullWidth
+                value={itemForm.unit}
+                onChange={(e) => setItemForm({ ...itemForm, unit: e.target.value })}
+                placeholder="e.g. m2, piece"
+              />
+              <TextField
+                label="Price"
+                required
+                fullWidth
+                type="number"
+                value={itemForm.price}
+                onChange={(e) => setItemForm({ ...itemForm, price: e.target.value })}
+                placeholder="50.00"
+                inputProps={{ step: '0.01', min: '0' }}
+              />
+            </Stack>
+            <TextField
+              label="Currency"
+              required
+              fullWidth
+              value={itemForm.currency}
+              onChange={(e) => setItemForm({ ...itemForm, currency: e.target.value })}
+              placeholder="GBP"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={itemForm.is_active}
+                  onChange={(e) => setItemForm({ ...itemForm, is_active: e.target.checked })}
+                />
+              }
+              label="Active"
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setItemDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleSaveItem}
+            variant="contained"
+            disabled={!itemForm.code || !itemForm.description || !itemForm.unit || !itemForm.price}
+          >
+            {editingItem ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }

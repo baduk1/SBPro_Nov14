@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -14,15 +14,15 @@ import {
   Stack,
   TextField,
   Typography,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material'
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Calculate as CalculateIcon
 } from '@mui/icons-material'
-import { mockCostAdjustments, mockEstimates } from '../mocks/mockData'
-import type { CostAdjustment } from '../types/extended'
+import { estimates, type Estimate, type CostAdjustment } from '../services/api'
 
 interface CostCalculatorProps {
   estimateId: string
@@ -43,17 +43,35 @@ const CALC_TYPE_OPTIONS = [
 ]
 
 export default function CostCalculator({ estimateId }: CostCalculatorProps) {
-  const estimate = mockEstimates.find(e => e.id === estimateId)
-  const [adjustments, setAdjustments] = useState<CostAdjustment[]>(
-    mockCostAdjustments.filter(adj => adj.estimate_id === estimateId)
-  )
+  const [estimate, setEstimate] = useState<Estimate | null>(null)
+  const [adjustments, setAdjustments] = useState<CostAdjustment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const [newAdjustment, setNewAdjustment] = useState({
-    category: 'overhead',
     name: '',
-    calculation_type: 'percent',
+    adjustment_type: 'percentage' as 'percentage' | 'fixed',
     value: 0
   })
+
+  useEffect(() => {
+    loadData()
+  }, [estimateId])
+
+  const loadData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await estimates.get(estimateId)
+      setEstimate(data)
+      setAdjustments(data.adjustments || [])
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to load estimate')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GB', {
@@ -62,59 +80,89 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
     }).format(amount)
   }
 
-  const handleAddAdjustment = () => {
+  const handleAddAdjustment = async () => {
     if (!newAdjustment.name || newAdjustment.value <= 0) {
-      alert('Please fill in all fields')
+      setError('Please fill in all fields with valid values')
       return
     }
 
-    const mockCalculatedAmount =
-      newAdjustment.calculation_type === 'percent'
-        ? (estimate!.base_total * newAdjustment.value) / 100
-        : newAdjustment.value
+    setSaving(true)
+    setError(null)
 
-    const adjustment: CostAdjustment = {
-      id: `adj-${Date.now()}`,
-      estimate_id: estimateId,
-      category: newAdjustment.category as any,
-      name: newAdjustment.name,
-      calculation_type: newAdjustment.calculation_type as any,
-      value: newAdjustment.value,
-      applied_to: 'subtotal',
-      order: adjustments.length + 1,
-      created_at: new Date().toISOString(),
-      calculated_amount: mockCalculatedAmount
+    try {
+      const created = await estimates.createAdjustment(estimateId, {
+        name: newAdjustment.name,
+        adjustment_type: newAdjustment.adjustment_type,
+        value: newAdjustment.value,
+        sort_order: adjustments.length
+      })
+
+      setAdjustments([...adjustments, created])
+      setNewAdjustment({
+        name: '',
+        adjustment_type: 'percentage',
+        value: 0
+      })
+
+      // Reload estimate to get updated totals
+      await loadData()
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to add adjustment')
+    } finally {
+      setSaving(false)
     }
-
-    setAdjustments([...adjustments, adjustment])
-    setNewAdjustment({
-      category: 'overhead',
-      name: '',
-      calculation_type: 'percent',
-      value: 0
-    })
-
-    alert('Adjustment added! (Mock - not saved to backend)')
   }
 
-  const handleDeleteAdjustment = (id: string) => {
-    setAdjustments(adjustments.filter(adj => adj.id !== id))
-    alert('Adjustment deleted! (Mock)')
+  const handleDeleteAdjustment = async (id: string) => {
+    if (!confirm('Delete this adjustment?')) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      await estimates.deleteAdjustment(estimateId, id)
+      setAdjustments(adjustments.filter(adj => adj.id !== id))
+
+      // Reload estimate to get updated totals
+      await loadData()
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Failed to delete adjustment')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const calculateTotals = () => {
-    const adjustmentsTotal = adjustments.reduce((sum, adj) => sum + (adj.calculated_amount || 0), 0)
     return {
-      base: estimate?.base_total || 0,
-      adjustments: adjustmentsTotal,
-      final: (estimate?.base_total || 0) + adjustmentsTotal
+      base: estimate?.subtotal || 0,
+      adjustments: adjustments.reduce((sum, adj) => sum + (adj.amount || 0), 0),
+      final: estimate?.total || 0
     }
   }
 
   const totals = calculateTotals()
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" py={8}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error && !estimate) {
+    return (
+      <Alert severity="error">{error}</Alert>
+    )
+  }
+
   return (
     <Box>
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
       <Grid container spacing={3}>
         {/* Left: Add Adjustment Form */}
         <Grid item xs={12} md={6}>
@@ -125,41 +173,26 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
               </Typography>
 
               <Stack spacing={2.5} mt={2}>
-                <FormControl fullWidth>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    value={newAdjustment.category}
-                    label="Category"
-                    onChange={(e) => setNewAdjustment({ ...newAdjustment, category: e.target.value })}
-                  >
-                    {CATEGORY_OPTIONS.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
                 <TextField
-                  label="Name"
+                  label="Adjustment Name"
                   fullWidth
+                  required
                   value={newAdjustment.name}
                   onChange={(e) => setNewAdjustment({ ...newAdjustment, name: e.target.value })}
-                  placeholder="e.g. General Overhead"
+                  placeholder="e.g. Overhead, Profit Margin, Tax"
+                  disabled={saving}
                 />
 
-                <FormControl fullWidth>
-                  <InputLabel>Calculation Type</InputLabel>
+                <FormControl fullWidth required>
+                  <InputLabel>Type</InputLabel>
                   <Select
-                    value={newAdjustment.calculation_type}
-                    label="Calculation Type"
-                    onChange={(e) => setNewAdjustment({ ...newAdjustment, calculation_type: e.target.value })}
+                    value={newAdjustment.adjustment_type}
+                    label="Type"
+                    onChange={(e) => setNewAdjustment({ ...newAdjustment, adjustment_type: e.target.value as 'percentage' | 'fixed' })}
+                    disabled={saving}
                   >
-                    {CALC_TYPE_OPTIONS.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
+                    <MenuItem value="percentage">Percentage (%)</MenuItem>
+                    <MenuItem value="fixed">Fixed Amount</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -167,23 +200,27 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
                   label="Value"
                   type="number"
                   fullWidth
+                  required
                   value={newAdjustment.value}
                   onChange={(e) => setNewAdjustment({ ...newAdjustment, value: parseFloat(e.target.value) || 0 })}
                   helperText={
-                    newAdjustment.calculation_type === 'percent'
+                    newAdjustment.adjustment_type === 'percentage'
                       ? 'Enter percentage (e.g. 10 for 10%)'
                       : 'Enter fixed amount in GBP'
                   }
+                  disabled={saving}
+                  inputProps={{ step: '0.01', min: '0' }}
                 />
 
                 <Button
                   variant="contained"
                   fullWidth
-                  startIcon={<AddIcon />}
+                  startIcon={saving ? <CircularProgress size={20} /> : <AddIcon />}
                   onClick={handleAddAdjustment}
                   size="large"
+                  disabled={saving || !newAdjustment.name || newAdjustment.value <= 0}
                 >
-                  Add Adjustment
+                  {saving ? 'Adding...' : 'Add Adjustment'}
                 </Button>
               </Stack>
             </CardContent>
@@ -215,17 +252,18 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
                             {adj.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {adj.category} • {adj.calculation_type === 'percent' ? `${adj.value}%` : formatCurrency(adj.value)}
+                            {adj.adjustment_type === 'percentage' ? `${adj.value}%` : formatCurrency(adj.value)}
                           </Typography>
                         </Box>
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography variant="body1" fontWeight="medium" color="success.main">
-                            +{formatCurrency(adj.calculated_amount || 0)}
+                            +{formatCurrency(adj.amount || 0)}
                           </Typography>
                           <IconButton
                             size="small"
                             color="error"
                             onClick={() => handleDeleteAdjustment(adj.id)}
+                            disabled={saving}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -264,7 +302,7 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
                       + {adj.name}
                     </Typography>
                     <Typography variant="body2" color="success.main">
-                      +{formatCurrency(adj.calculated_amount || 0)}
+                      +{formatCurrency(adj.amount || 0)}
                     </Typography>
                   </Stack>
                 ))}
@@ -280,15 +318,6 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
                   </Typography>
                 </Stack>
               </Stack>
-
-              <Button
-                variant="outlined"
-                fullWidth
-                sx={{ mt: 3 }}
-                onClick={() => alert('Recalculate & Save - to be implemented')}
-              >
-                Save Changes
-              </Button>
             </CardContent>
           </Card>
         </Grid>
