@@ -364,5 +364,5 @@ POST   /api/v1/auth/verify-email
 
 ---
 
-*Обновлено: 2025-10-07*
-*Автор: George Mikadze*
+*Обновлено: 2025-10-25*
+*Автор: Georgy Mikadze*

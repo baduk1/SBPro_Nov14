@@ -387,7 +387,7 @@ sudo bash deploy.sh
 
 ### Option B: Manual Deployment
 
-See `CLAUDE.md` and `backend/README.md` for step-by-step manual deployment instructions.
+See `DEPLOYMENT.md` and `backend/README.md` for step-by-step manual deployment instructions.
 
 ---
 

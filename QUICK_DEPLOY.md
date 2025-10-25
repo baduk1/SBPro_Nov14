@@ -274,7 +274,6 @@ After successful deployment:
 
 **For detailed information:**
 - Full docs: `PRODUCTION_READINESS_REPORT.md`
-- Architecture: `CLAUDE.md`
 - Backend setup: `backend/README.md`
 
 **Need help?** support@skybuild.pro

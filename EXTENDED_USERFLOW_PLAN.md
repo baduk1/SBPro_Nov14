@@ -1851,6 +1851,6 @@ export default function CostCalculator({ estimateId }: CostCalculatorProps) {
 ---
 
 *План создан: 2025-10-03*
-*Обновлен: 2025-10-07 (v2.0 - Custdev-Focused MVP)*
-*Автор: George Mikadze*
+*Обновлен: 2025-10-25 (v2.0 - Custdev-Focused MVP)*
+*Автор: Georgy Mikadze*
 *Статус: Ready for implementation*
