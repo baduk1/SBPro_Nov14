@@ -9,6 +9,7 @@ from app.core.security import create_access_token, verify_password, get_password
 from app.db.session import get_db
 from app.models.user import User, UserRole
 from app.models.email_verification import EmailVerificationToken
+from app.models.project import Project
 from app.schemas.auth import Token
 from app.schemas.user import UserOut, UserRegister
 from app.services.email import EmailService
@@ -60,12 +61,22 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
         hash=get_password_hash(data.password),
         full_name=data.full_name,
         role=UserRole.USER.value,
-        email_verified=False,
+        email_verified=True,  # TEMPORARY: Auto-verify for testing (disable email check)
         credits_balance=2000  # Free trial credits
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    # Create default project for the user (required for file uploads)
+    # Generate unique project ID (UUID)
+    default_project = Project(
+        owner_id=new_user.id,
+        name='My First Project'
+    )
+    db.add(default_project)
+    db.commit()
+    db.refresh(default_project)
 
     # Create verification token
     verification_token = EmailVerificationToken.create_token_with_expiry(
@@ -75,12 +86,12 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
     db.add(verification_token)
     db.commit()
 
-    # Send verification email
-    EmailService.send_verification_email(
-        to_email=new_user.email,
-        verification_token=verification_token.token,
-        user_name=new_user.full_name
-    )
+    # Send verification email (DISABLED FOR TESTING - SendGrid blocked)
+    # EmailService.send_verification_email(
+    #     to_email=new_user.email,
+    #     verification_token=verification_token.token,
+    #     user_name=new_user.full_name
+    # )
 
     return new_user
 

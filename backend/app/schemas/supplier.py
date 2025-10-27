@@ -37,7 +37,7 @@ class SupplierPriceItemBase(BaseModel):
     code: str
     description: str
     unit: str
-    price: int  # price in minor units (pence/cents)
+    price: float  # price as decimal (e.g., 44.80 for £44.80)
     currency: str = "GBP"
     is_active: bool = True
     effective_from: Optional[datetime] = None
@@ -51,7 +51,7 @@ class SupplierPriceItemUpdate(BaseModel):
     code: Optional[str] = None
     description: Optional[str] = None
     unit: Optional[str] = None
-    price: Optional[int] = None
+    price: Optional[float] = None
     currency: Optional[str] = None
     is_active: Optional[bool] = None
     effective_from: Optional[datetime] = None

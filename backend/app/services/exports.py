@@ -18,11 +18,15 @@ def _collect_rows(db: Session, job_id: str):
     q = db.query(BoqItem).filter(BoqItem.job_id == job_id).all()
     rows = []
     for i in q:
-        rate = 0.0
-        if i.mapped_price_item_id:
+        # Priority 1: Use unit_price if set (from supplier prices)
+        rate = float(i.unit_price or 0.0)
+        
+        # Priority 2: Fallback to admin price list (old system)
+        if rate == 0.0 and i.mapped_price_item_id:
             pi = db.query(PriceItem).get(i.mapped_price_item_id)
             if pi:
                 rate = float(pi.rate)
+        
         rows.append(
             {
                 "code": i.code or "",

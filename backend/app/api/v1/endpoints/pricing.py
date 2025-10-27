@@ -65,15 +65,17 @@ def apply_prices_endpoint(
 
         matched_count = 0
         for boq_item in boq_items:
-            # Match by element_type code
+            # Match by code (BOQ code vs Supplier price item code)
             matching_price = next(
-                (p for p in price_items if p.code == boq_item.element_type),
+                (p for p in price_items if p.code == boq_item.code),
                 None
             )
             if matching_price:
-                # Convert from minor units (pence) to major units (pounds)
-                boq_item.unit_price = matching_price.price / 100.0
+                # Price is already in major units (e.g., 44.80 for £44.80)
+                boq_item.unit_price = matching_price.price
                 boq_item.total_price = boq_item.qty * boq_item.unit_price
+                # Note: mapped_price_item_id is for admin price lists, not supplier prices
+                # We don't set it here to avoid foreign key constraint errors
                 matched_count += 1
 
         db.commit()
@@ -81,7 +83,7 @@ def apply_prices_endpoint(
         if matched_count == 0:
             raise HTTPException(
                 status_code=400,
-                detail=f"No items matched. Supplier '{supplier.name}' codes don't match takeoff element types."
+                detail=f"No items matched. Supplier '{supplier.name}' price codes don't match any BOQ item codes."
             )
 
         return boq_items

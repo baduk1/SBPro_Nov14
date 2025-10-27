@@ -15,3 +15,5 @@ class BoqItem(Base):
     source_ref = Column(String, nullable=True)
     mapped_price_item_id = Column(String, ForeignKey("price_items.id"), nullable=True)
     allowance_amount = Column(Float, default=0.0)
+    unit_price = Column(Float, default=0.0)  # Price per unit
+    total_price = Column(Float, default=0.0)  # qty * unit_price

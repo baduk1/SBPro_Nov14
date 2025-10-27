@@ -13,6 +13,8 @@ class BoqItemOut(BaseModel):
     source_ref: Optional[str] = None
     mapped_price_item_id: Optional[str] = None
     allowance_amount: float = 0.0
+    unit_price: float = 0.0
+    total_price: float = 0.0
 
 
 class MappingPatchItem(BaseModel):

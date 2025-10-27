@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline } from '@mui/material'
 
 import LandingNew from './pages/LandingNew'
+import LandingBCG from './pages/LandingBCG'
+import LandingApplyAI from './pages/LandingApplyAI'
 import Shell from './App'
 import Dashboard from './pages/Dashboard'
 import SignIn from './pages/SignIn'
@@ -29,6 +31,8 @@ import { ColorModeProvider } from './hooks/useColorMode'
 
 const router = createBrowserRouter([
   { path: '/', element: <LandingNew /> },
+  { path: '/version_1', element: <LandingBCG /> },
+  { path: '/version_2', element: <LandingApplyAI /> },
   { path: '/verify-email', element: <VerifyEmail /> },
   { path: '/onboarding', element: <Onboarding /> },
   {

@@ -285,9 +285,13 @@ async def bulk_import_price_items(
     """
     Bulk import price items from CSV file.
 
-    Expected CSV format:
-    code,description,unit,price,currency
-    BRK-001,Standard Brick,piece,50,GBP
+    Expected CSV format (supports both 'price' and 'rate' columns):
+    code,description,unit,rate,currency
+    BRK-001,Standard Brick,piece,50.00,GBP
+    
+    OR:
+    code,description,unit,price
+    E10/100,Walls,m2,44.80
     """
     # Verify ownership
     supplier = db.query(Supplier).filter(
@@ -311,31 +315,53 @@ async def bulk_import_price_items(
 
     for row_num, row in enumerate(reader, start=2):
         try:
-            # Validate required fields
-            if not all(k in row for k in ['code', 'description', 'unit', 'price']):
-                errors.append(f"Row {row_num}: Missing required fields")
+            # Validate required fields (code, description, unit)
+            if not all(k in row for k in ['code', 'description', 'unit']):
+                errors.append(f"Row {row_num}: Missing required fields (code, description, unit)")
                 skipped_count += 1
                 continue
 
-            # Convert price to minor units (pence/cents)
+            # Support both 'price' and 'rate' column names
+            price_value = row.get('price') or row.get('rate')
+            if not price_value:
+                errors.append(f"Row {row_num}: Missing price/rate field")
+                skipped_count += 1
+                continue
+
+            # Parse price as float (no conversion to minor units - store as-is)
             try:
-                price_float = float(row['price'])
-                price_minor = int(price_float * 100)
+                price_float = float(price_value)
             except ValueError:
-                errors.append(f"Row {row_num}: Invalid price format")
+                errors.append(f"Row {row_num}: Invalid price format '{price_value}'")
                 skipped_count += 1
                 continue
 
-            item = SupplierPriceItem(
-                supplier_id=id,
-                code=row['code'],
-                description=row['description'],
-                unit=row['unit'],
-                price=price_minor,
-                currency=row.get('currency', 'GBP'),
-                is_active=True
-            )
-            db.add(item)
+            # Check for duplicate code in this supplier
+            existing = db.query(SupplierPriceItem).filter(
+                SupplierPriceItem.supplier_id == id,
+                SupplierPriceItem.code == row['code']
+            ).first()
+            
+            if existing:
+                # Update existing item instead of creating duplicate
+                existing.description = row['description']
+                existing.unit = row['unit']
+                existing.price = price_float
+                existing.currency = row.get('currency', 'GBP')
+                existing.is_active = True
+            else:
+                # Create new item
+                item = SupplierPriceItem(
+                    supplier_id=id,
+                    code=row['code'],
+                    description=row['description'],
+                    unit=row['unit'],
+                    price=price_float,
+                    currency=row.get('currency', 'GBP'),
+                    is_active=True
+                )
+                db.add(item)
+            
             imported_count += 1
 
         except Exception as e:

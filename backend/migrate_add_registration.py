@@ -53,7 +53,7 @@ def migrate():
         # Add email_verified column
         if 'email_verified' not in current_columns:
             print("Adding email_verified column...")
-            conn.execute(text("ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT 0"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT FALSE"))
             conn.commit()
             print("✅ email_verified added")
 

@@ -2,18 +2,40 @@ import { useEffect, useRef, useState } from 'react'
 import { Box, Button, Stepper, Step, StepLabel, TextField, Typography, Paper, Chip } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { API_URL, uploads, jobs } from '../services/api'
+import { API_URL, uploads, jobs, projects } from '../services/api'
 
 const steps = ['File', 'Details', 'Upload']
 
 export default function FileUpload() {
-  const [projectId, setProjectId] = useState('demo-project')
+  const [projectId, setProjectId] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [activeStep, setActiveStep] = useState(0)
   const [uploadPct, setUploadPct] = useState(0)
   const [busy, setBusy] = useState(false)
+  const [loadingProject, setLoadingProject] = useState(true)
   const dropRef = useRef<HTMLDivElement | null>(null)
   const navigate = useNavigate()
+
+  // Load user's first project on mount
+  useEffect(() => {
+    async function loadProject() {
+      try {
+        const userProjects = await projects.list()
+        if (userProjects.length > 0) {
+          setProjectId(userProjects[0].id)
+        } else {
+          // No projects found - create a default one
+          const newProject = await projects.create({ name: 'My First Project' })
+          setProjectId(newProject.id)
+        }
+      } catch (err) {
+        console.error('Failed to load project:', err)
+      } finally {
+        setLoadingProject(false)
+      }
+    }
+    loadProject()
+  }, [])
 
   // Default acceptance: IFC models for take-off
   const accept = '.ifc,model/x-ifc,application/octet-stream'

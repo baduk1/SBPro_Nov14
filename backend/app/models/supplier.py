@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from uuid import uuid4
@@ -29,7 +29,7 @@ class SupplierPriceItem(Base):
     code = Column(String, nullable=False)
     description = Column(String, nullable=False)
     unit = Column(String, nullable=False)
-    price = Column(Integer, nullable=False)  # price in minor units (cents/pennies)
+    price = Column(Float, nullable=False)  # price as decimal (e.g., 10.50 for £10.50)
     currency = Column(String, default="GBP")
     effective_from = Column(DateTime(timezone=True), nullable=True)
     is_active = Column(Boolean, default=True)

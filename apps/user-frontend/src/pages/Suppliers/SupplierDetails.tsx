@@ -372,25 +372,40 @@ export default function SupplierDetails() {
       </TabPanel>
 
       {/* Import CSV Dialog */}
-      <Dialog open={importDialogOpen} onClose={() => !importing && setImportDialogOpen(false)}>
+      <Dialog open={importDialogOpen} onClose={() => !importing && setImportDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Import Price Items from CSV</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" mb={2}>
-            Upload a CSV file with columns: code, description, unit, price, currency
-          </Typography>
-          <Button
-            variant="outlined"
-            component="label"
-            fullWidth
-          >
-            {csvFile ? csvFile.name : 'Choose CSV File'}
-            <input
-              type="file"
-              hidden
-              accept=".csv"
-              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-            />
-          </Button>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Upload a CSV file with the following columns:
+            </Typography>
+            <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1, fontFamily: 'monospace', fontSize: '0.875rem' }}>
+              code,description,unit,rate,currency
+              <br />
+              E10/100,Walls,m2,44.80,GBP
+              <br />
+              F10/100,Floors,m2,33.70,GBP
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Required columns:</strong> code, description, unit, rate (or price)
+              <br />
+              <strong>Optional:</strong> currency (defaults to GBP)
+            </Typography>
+            <Button
+              variant="outlined"
+              component="label"
+              fullWidth
+              size="large"
+            >
+              {csvFile ? csvFile.name : 'Choose CSV File'}
+              <input
+                type="file"
+                hidden
+                accept=".csv"
+                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+              />
+            </Button>
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setImportDialogOpen(false)} disabled={importing}>

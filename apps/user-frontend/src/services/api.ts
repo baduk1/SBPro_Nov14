@@ -451,4 +451,34 @@ export const estimates = {
   },
 }
 
+// Projects API
+export interface Project {
+  id: string
+  owner_id: string
+  name: string
+  created_at: string
+}
+
+export const projects = {
+  list: async () => {
+    const res = await api.get<Project[]>('/projects')
+    return res.data
+  },
+  get: async (id: string) => {
+    const res = await api.get<Project>(`/projects/${id}`)
+    return res.data
+  },
+  create: async (data: { name: string }) => {
+    const res = await api.post<Project>('/projects', data)
+    return res.data
+  },
+  update: async (id: string, data: { name: string }) => {
+    const res = await api.patch<Project>(`/projects/${id}`, data)
+    return res.data
+  },
+  delete: async (id: string) => {
+    await api.delete(`/projects/${id}`)
+  },
+}
+
 export default api
