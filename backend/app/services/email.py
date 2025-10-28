@@ -214,3 +214,85 @@ class EmailService:
             html_content=html_content,
             text_content=text_content
         )
+
+    @staticmethod
+    def send_invite_email(to_email: str, verification_token: str, user_name: Optional[str] = None) -> bool:
+        """Send invitation email for admin-approved access requests"""
+        invite_url = f"{settings.FRONTEND_URL}/complete-invite?token={verification_token}"
+
+        greeting = f"Hi {user_name}," if user_name else "Hi,"
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }}
+                .button {{ display: inline-block; padding: 14px 28px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }}
+                .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎉 Your SkyBuild Pro Access Approved!</h1>
+                </div>
+                <div class="content">
+                    <p>{greeting}</p>
+                    <p>Good news! Your access request has been approved. Welcome to SkyBuild Pro!</p>
+                    <p>To activate your account and set your password, please click the button below:</p>
+                    <div style="text-align: center;">
+                        <a href="{invite_url}" class="button">Activate Account & Set Password</a>
+                    </div>
+                    <p>Or copy and paste this link into your browser:</p>
+                    <p style="background: white; padding: 10px; border-radius: 4px; word-break: break-all;">{invite_url}</p>
+                    <p><strong>Your account includes:</strong></p>
+                    <ul>
+                        <li>2,000 free credits (≈10 projects)</li>
+                        <li>1 supplier with unlimited price items</li>
+                        <li>AI-powered quantity takeoff</li>
+                        <li>Export to CSV, Excel, and PDF</li>
+                        <li>Email support</li>
+                    </ul>
+                    <p>This invitation link will expire in 7 days.</p>
+                    <p>If you didn't request access, please contact our support team.</p>
+                </div>
+                <div class="footer">
+                    <p>© 2025 SkyBuild Pro. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_content = f"""
+        {greeting}
+
+        Your access request has been approved! Welcome to SkyBuild Pro.
+
+        To activate your account and set your password, click this link:
+        {invite_url}
+
+        Your account includes:
+        - 2,000 free credits (≈10 projects)
+        - 1 supplier with unlimited price items
+        - AI-powered quantity takeoff
+        - Export to CSV, Excel, and PDF
+        - Email support
+
+        This invitation link will expire in 7 days.
+
+        If you didn't request access, please contact our support team.
+
+        © 2025 SkyBuild Pro
+        """
+
+        return EmailService.send_email(
+            to_email=to_email,
+            subject="Your SkyBuild Pro Access is Ready - Set Your Password",
+            html_content=html_content,
+            text_content=text_content
+        )

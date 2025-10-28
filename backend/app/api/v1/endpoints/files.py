@@ -7,6 +7,7 @@ from app.api.deps import current_user
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.file import File
+from app.models.project import Project
 from app.models.user import User
 from app.schemas.file import FileOut, PresignedUpload, PresignUploadRequest
 from app.services.storage import uploads_path, generate_presigned_url, verify_presigned
@@ -21,9 +22,18 @@ def create_presigned(
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
+    # SECURITY: Verify project ownership before allowing file upload
+    project = db.query(Project).filter(
+        Project.id == payload.project_id,
+        Project.owner_id == user.id
+    ).first()
+    if not project:
+        raise HTTPException(status_code=403, detail="Project not found or access denied")
+    
     ftype_u = (payload.file_type or "").upper()
     if ftype_u not in settings.ALLOWED_UPLOAD_TYPES:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {payload.file_type}")
+    
     f = File(project_id=payload.project_id, user_id=user.id, filename=payload.filename, type=ftype_u)
     db.add(f)
     db.commit()

@@ -148,6 +148,9 @@ def resend_verification(email: str, db: Session = Depends(get_db)):
     if user.email_verified:
         raise HTTPException(status_code=400, detail="Email already verified")
 
+    # TODO: Add server-side throttle (60s per email/IP)
+    # Check last_verification_sent_at or use in-memory cache
+
     # Create new verification token
     verification_token = EmailVerificationToken.create_token_with_expiry(
         user_id=user.id,
@@ -164,3 +167,51 @@ def resend_verification(email: str, db: Session = Depends(get_db)):
     )
 
     return {"message": "Verification email sent", "email": user.email}
+
+
+@router.post("/complete-invite")
+def complete_invite(token: str, password: str, db: Session = Depends(get_db)):
+    """
+    Complete invite by setting password and verifying email.
+    Used for admin-approved access requests.
+    """
+    # Find invite token
+    invite = db.query(EmailVerificationToken).filter(
+        EmailVerificationToken.token == token
+    ).first()
+
+    if not invite:
+        raise HTTPException(status_code=400, detail="Invalid invite token")
+
+    # Check if already used
+    if invite.used_at:
+        raise HTTPException(status_code=400, detail="Invite token already used")
+
+    # Check if expired
+    if invite.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Invite token expired")
+
+    # Get user
+    user = db.query(User).filter(User.id == invite.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Set password and verify email
+    user.hash = get_password_hash(password)
+    user.email_verified = True
+    invite.used_at = datetime.utcnow()
+
+    db.commit()
+
+    # Create login token
+    token = create_access_token(
+        {"sub": user.id, "role": user.role},
+        timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+
+    return {
+        "message": "Account activated successfully",
+        "email": user.email,
+        "access_token": token,
+        "token_type": "bearer"
+    }

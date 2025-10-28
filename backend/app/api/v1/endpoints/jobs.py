@@ -2,6 +2,7 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sse_starlette.sse import EventSourceResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 
 from app.api.deps import current_user
 from app.core.config import settings
@@ -24,18 +25,28 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
     # Check file exists and user owns it
     f = db.query(File).filter(File.id == payload.file_id, File.user_id == user.id).first()
     if not f:
-        raise HTTPException(status_code=400, detail="Invalid file")
+        raise HTTPException(status_code=404, detail="File not found")
 
-    # Check user has enough credits
     job_cost = settings.COST_PER_JOB
-    if user.credits_balance < job_cost:
+
+    # ATOMIC credits deduction (works on SQLite AND Postgres, race-condition safe)
+    # Use conditional UPDATE that only succeeds if credits >= cost
+    stmt = (
+        update(User)
+        .where(User.id == user.id, User.credits_balance >= job_cost)
+        .values(credits_balance=User.credits_balance - job_cost)
+    )
+    result = db.execute(stmt)
+    
+    # Check if update succeeded (rowcount == 1 means credits were deducted)
+    if result.rowcount == 0:
+        # Either user doesn't exist (shouldn't happen) or insufficient credits
+        db.rollback()
+        current_balance = db.query(User.credits_balance).filter(User.id == user.id).scalar()
         raise HTTPException(
             status_code=402,  # Payment Required
-            detail=f"Insufficient credits. Required: {job_cost}, Available: {user.credits_balance}"
+            detail=f"Insufficient credits. Required: {job_cost}, Available: {current_balance or 0}"
         )
-
-    # Deduct credits (will be committed with job creation atomically)
-    user.credits_balance -= job_cost
 
     # pick active price list if not provided
     price_list_id = payload.price_list_id
@@ -43,7 +54,7 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
         pl = db.query(PriceList).filter(PriceList.is_active == True).order_by(PriceList.effective_from.desc().nullslast()).first()  # noqa: E712
         price_list_id = pl.id if pl else None
 
-    # Create job - this commits credits deduction and job creation atomically
+    # Create job - credits already deducted atomically above
     j = Job(
         project_id=payload.project_id,
         user_id=user.id,
@@ -55,11 +66,11 @@ def create_job(payload: JobCreate, background: BackgroundTasks, user: User = Dep
     db.add(j)
 
     try:
-        # ATOMIC: Commit credits deduction + job creation together
+        # Commit job creation (credits already deducted)
         db.commit()
         db.refresh(j)
     except Exception as e:
-        # Rollback on failure (credits and job not created)
+        # Rollback on failure (will restore credits and not create job)
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to create job: {str(e)}")
 

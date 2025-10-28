@@ -479,6 +479,10 @@ export const projects = {
   delete: async (id: string) => {
     await api.delete(`/projects/${id}`)
   },
+  getHistory: async (id: string) => {
+    const res = await api.get<any[]>(`/projects/${id}/history`)
+    return res.data
+  },
 }
 
 export default api
