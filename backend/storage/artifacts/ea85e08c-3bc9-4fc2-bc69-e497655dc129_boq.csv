@@ -1,0 +1,42 @@
+code,description,unit,qty,allowance,rate,amount
+L10/200,Window – M_Fixed:2800mm x 2410mm:2800mm x 2410mm:147686,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm:171975,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:750mm x 2200mm:750mm x 2200mm:147051,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:180864,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Casement:819mm x 759mm:819mm x 759mm:180994,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Casement:819mm x 759mm:819mm x 759mm:148607,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:159834,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:180663,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:148722,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:4835mm x 2420mm:4835mm x 2420mm:146016,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:2800mm x 2410mm:2800mm x 2410mm:149278,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:2800mm x 2410mm:2800mm x 2410mm:181096,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:160065,piece,1.0,0.0,0.0,0.0
+E40/100,Stair – Stair:Residential - 200mm Max Riser 250mm Tread:198878,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:160208,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:750mm x 2200mm:750mm x 2200mm:146885,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm:146596,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:149537,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:750mm x 2200mm:750mm x 2200mm:182101,piece,1.0,0.0,0.0,0.0
+E40/100,Stair – Stair:Residential - 200mm Max Riser 250mm Tread:151086,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Casement:819mm x 759mm:819mm x 759mm:181548,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:159734,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Skylight:1180 x 1170mm:1180 x 1170mm:185337,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:147994,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:2800mm x 2410mm:2800mm x 2410mm:180318,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Skylight:1180 x 1170mm:1180 x 1170mm:185718,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:4835mm x 2420mm:4835mm x 2420mm:145788,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:150378,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:750mm x 2200mm:750mm x 2200mm:181930,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:181583,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0864 x 2032mm:0864 x 2032mm:150478,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0762 x 2032mm:0762 x 2032mm:150257,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:181285,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0762 x 2032mm:0762 x 2032mm:203720,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm:171853,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0762 x 2032mm:0762 x 2032mm:150173,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm:146678,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Casement:819mm x 759mm:819mm x 759mm:149736,piece,1.0,0.0,0.0,0.0
+L10/100,Door – M_Single-Flush:0762 x 2032mm:0762 x 2032mm:204034,piece,1.0,0.0,0.0,0.0
+L10/200,Window – M_Fixed:819mm x 759mm:819mm x 759mm:149924,piece,1.0,0.0,0.0,0.0
+,TOTAL,,,,,0.0

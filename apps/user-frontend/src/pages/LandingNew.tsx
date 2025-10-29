@@ -11,6 +11,7 @@ import {
 
 export default function LandingNew() {
   const navigate = useNavigate()
+  // Updated: 2025-10-29 with header navigation
 
   const features = [
     {
