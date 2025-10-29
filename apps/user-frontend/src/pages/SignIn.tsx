@@ -64,6 +64,11 @@ export default function SignIn() {
     }
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submit()
+  }
+
   return (
     <Box sx={{maxWidth:380, mx:'auto', mt: 4}}>
       <Typography variant="h5" sx={{mb:1}}>Sign in</Typography>
@@ -73,9 +78,11 @@ export default function SignIn() {
           Demo mode: use email <strong>"test"</strong> (any password)
         </Alert>
       )}
-      <TextField fullWidth label="Email" value={email} onChange={(e)=>setEmail(e.target.value)} sx={{mb:2}} />
-      <TextField fullWidth type="password" label="Password" value={password} onChange={(e)=>setPassword(e.target.value)} sx={{mb:2}} />
-      <Button variant="contained" fullWidth onClick={submit} disabled={loading}>Sign in</Button>
+      <form onSubmit={handleSubmit}>
+        <TextField fullWidth label="Email" value={email} onChange={(e)=>setEmail(e.target.value)} sx={{mb:2}} />
+        <TextField fullWidth type="password" label="Password" value={password} onChange={(e)=>setPassword(e.target.value)} sx={{mb:2}} />
+        <Button variant="contained" fullWidth type="submit" disabled={loading}>Sign in</Button>
+      </form>
       
       {error && <Alert severity="error" sx={{mt:2}}>{error}</Alert>}
       
