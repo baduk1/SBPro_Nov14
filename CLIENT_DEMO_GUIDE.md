@@ -1,8 +1,21 @@
 # 📸 SkyBuild Pro - Client Demo Guide & Screenshots
 
 **Production URL:** https://skybuildpro.co.uk  
-**Updated:** 2025-10-28 (Session 3 - GPT-5 Pro Critical Fixes)  
+**Updated:** 2025-10-29 (Latest: Header Navigation + Enter Key Support)  
 **Status:** ✅ Ready for October 30th Demo
+
+---
+
+## 🔑 TEST CREDENTIALS
+
+**Test Account for Demo:**
+- **Email:** `george.mikadze@gmail.com` (or register new)
+- **Credits:** 2000 (free trial)
+- **Project:** Auto-created "My First Project"
+
+**Admin Panel:**
+- **URL:** https://admin.skybuildpro.co.uk
+- **Email:** Check `PRODUCTION_CREDENTIALS.txt` file
 
 ---
 
@@ -20,7 +33,10 @@ This guide provides all URLs and endpoints for preparing screenshots and client 
 - **URL:** `https://skybuildpro.co.uk/`
 - **Screenshot:** Hero section, features, pricing, CTA buttons
 - **Key Elements:** 
-  - Navigation bar (Sign In, Sign Up, Features, Pricing)
+  - ✅ **NEW: Sticky Header with Auth Buttons:**
+    - 🏗️ SkyBuild Pro logo (clickable, returns to home)
+    - 🔑 "Sign In" button (text style, secondary)
+    - 🚀 "Start Free Trial" button (contained, primary, gradient)
   - Hero with main value proposition
   - Features section (IFC/DWG upload, AI takeoff, pricing)
   - Pricing tiers
@@ -66,9 +82,10 @@ This guide provides all URLs and endpoints for preparing screenshots and client 
   - Email
   - Password
 - **Features:**
+  - ✅ **NEW: Enter key support** - press Enter to submit form
   - ✅ "Resend Verification Email" button (appears if email not verified)
   - ✅ 60s cooldown timer
-  - ❌ Demo text hidden in production
+  - ❌ Demo text hidden in production (only shows in dev mode)
 
 #### Email Verification
 - **URL:** `https://skybuildpro.co.uk/verify-email?token=...`
@@ -870,12 +887,15 @@ This guide provides all URLs and endpoints for preparing screenshots and client 
 - ✅ Project ownership checks on file upload
 - ✅ Race-safe credits deduction
 - ✅ Complete invite flow (no passwords in email)
+- ✅ IONOS SMTP configured for email verification
 
 ### **Features (P1)**
 - ✅ Real project history (no mocks)
 - ✅ Resend verification with cooldown
 - ✅ Production-ready UI (demo text hidden)
 - ✅ CSV price list import (bulk, updates duplicates)
+- ✅ **NEW (Oct 29):** Header navigation buttons on all landing pages
+- ✅ **NEW (Oct 29):** Enter key support on login form
 
 ### **UX Improvements**
 - ✅ Loading states everywhere
