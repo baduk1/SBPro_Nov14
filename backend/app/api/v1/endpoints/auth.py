@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -118,7 +118,7 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Verification token already used")
 
     # Check if expired
-    if verification.expires_at < datetime.utcnow():
+    if verification.expires_at < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Verification token expired")
 
     # Mark user as verified
@@ -127,7 +127,7 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
 
     user.email_verified = True
-    verification.used_at = datetime.utcnow()
+    verification.used_at = datetime.now(timezone.utc)
 
     db.commit()
 

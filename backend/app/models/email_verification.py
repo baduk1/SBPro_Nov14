@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from sqlalchemy import Column, String, DateTime, ForeignKey
@@ -22,5 +22,5 @@ class EmailVerificationToken(Base):
         """Helper to create a token that expires in N hours"""
         return EmailVerificationToken(
             user_id=user_id,
-            expires_at=datetime.utcnow() + timedelta(hours=hours)
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=hours)
         )
