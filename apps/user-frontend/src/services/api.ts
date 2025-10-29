@@ -33,6 +33,8 @@ export interface Job {
   status: JobStatus
   progress?: number
   created_at?: string
+  type?: string
+  name?: string
 }
 
 export interface PresignResponse {
@@ -131,6 +133,10 @@ export const jobs = {
   },
   get: async (id: string) => {
     const res = await api.get<Job>(`/jobs/${id}`)
+    return res.data
+  },
+  getBoq: async (id: string) => {
+    const res = await api.get<any[]>(`/jobs/${id}/boq`)
     return res.data
   },
   takeoff: async (id: string) => {

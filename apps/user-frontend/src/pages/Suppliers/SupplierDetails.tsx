@@ -136,7 +136,7 @@ export default function SupplierDetails() {
         code: item.code,
         description: item.description,
         unit: item.unit,
-        price: (item.price / 100).toFixed(2), // Convert from minor units
+        price: item.price.toFixed(2), // Price is stored as-is in the database
         currency: item.currency,
         is_active: item.is_active
       })
@@ -168,7 +168,7 @@ export default function SupplierDetails() {
         code: itemForm.code,
         description: itemForm.description,
         unit: itemForm.unit,
-        price: Math.round(priceFloat * 100), // Convert to minor units
+        price: priceFloat, // Store price as-is (no conversion to minor units)
         currency: itemForm.currency,
         is_active: itemForm.is_active
       }

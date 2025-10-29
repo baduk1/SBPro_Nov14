@@ -21,7 +21,31 @@ export function useAuth() {
       setLoading(false)
       return true
     } catch (e: any) {
-      setError(e?.response?.data?.detail || 'Login failed')
+      // Detailed error logging
+      console.error('Login error:', e)
+      console.error('Error response:', e?.response)
+      console.error('Error data:', e?.response?.data)
+      
+      let errorMessage = 'Login failed'
+      
+      if (e?.response?.data?.detail) {
+        // Backend returned specific error
+        errorMessage = e.response.data.detail
+      } else if (e?.response?.status === 400) {
+        errorMessage = '❌ Incorrect email or password. Please try again.'
+      } else if (e?.response?.status === 403) {
+        errorMessage = '🔒 Email not verified. Please check your inbox for the verification link.'
+      } else if (e?.response?.status === 404) {
+        errorMessage = '❌ Account not found. Please check your email or sign up.'
+      } else if (e?.response?.status === 500) {
+        errorMessage = '⚠️ Server error. Please try again later or contact support.'
+      } else if (e?.message === 'Network Error' || !e?.response) {
+        errorMessage = '❌ Cannot connect to server. Please check your internet connection or try again later.'
+      } else if (e?.code === 'ECONNABORTED') {
+        errorMessage = '⏱️ Request timeout. Please check your connection and try again.'
+      }
+      
+      setError(errorMessage)
       setLoading(false)
       return false
     }

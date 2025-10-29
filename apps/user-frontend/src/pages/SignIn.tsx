@@ -52,13 +52,26 @@ export default function SignIn() {
       setResendSuccess(true)
       setCooldown(60) // 60 second cooldown
     } catch (err: any) {
+      console.error('Resend verification error:', err)
+      console.error('Error response:', err?.response)
+      
+      let errorMessage = 'Failed to resend email'
+      
       // Handle 429 throttle error from server
       if (err?.response?.status === 429) {
-        setResendError('Please wait before requesting another email.')
+        errorMessage = '⏱️ Please wait before requesting another email.'
         setCooldown(60)
-      } else {
-        setResendError(err?.response?.data?.detail || 'Failed to resend email')
+      } else if (err?.response?.data?.detail) {
+        errorMessage = err.response.data.detail
+      } else if (err?.response?.status === 404) {
+        errorMessage = '❌ User not found. Please check your email address.'
+      } else if (err?.message === 'Network Error' || !err?.response) {
+        errorMessage = '❌ Cannot connect to server. Please check your internet connection.'
+      } else if (err?.response?.status === 500) {
+        errorMessage = '⚠️ Server error. Please try again later.'
       }
+      
+      setResendError(errorMessage)
     } finally {
       setResendLoading(false)
     }
@@ -113,6 +126,15 @@ export default function SignIn() {
           {resendError}
         </Alert>
       )}
+      
+      <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          Don't have an account?{' '}
+          <Link href="/app/signup" sx={{ fontWeight: 600, textDecoration: 'none' }}>
+            Sign Up
+          </Link>
+        </Typography>
+      </Box>
     </Box>
   )
 }
