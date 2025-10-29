@@ -20,7 +20,7 @@ import {
   CloudUpload as CloudUploadIcon,
   PlayArrow as PlayArrowIcon
 } from '@mui/icons-material'
-import api from '../../services/api'
+import { projects } from '../../services/api'
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
   created: <FolderOpenIcon />,
@@ -52,7 +52,7 @@ export default function ProjectHistory() {
       if (!id) return
       try {
         setLoading(true)
-        const data = await api.projects.getHistory(id)
+        const data = await projects.getHistory(id)
         setHistory(data)
       } catch (err: any) {
         console.error('Failed to load history:', err)

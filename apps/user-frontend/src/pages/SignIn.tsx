@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, Button, TextField, Typography, Alert, Link } from '@mui/material'
 import { useAuth } from '../hooks/useAuth'
-import api from '../services/api'
+import { auth } from '../services/api'
 
 export default function SignIn() {
   // Only use demo email in development mode
@@ -48,7 +48,7 @@ export default function SignIn() {
     setResendSuccess(false)
     
     try {
-      await api.auth.resendVerification(email)
+      await auth.resendVerification(email)
       setResendSuccess(true)
       setCooldown(60) // 60 second cooldown
     } catch (err: any) {
