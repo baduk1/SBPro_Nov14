@@ -14,8 +14,8 @@ export default function Landing() {
           Upload apartment/interior DWG or IFC and get an audit‑ready, priced Bill of Quantities in minutes.
         </Typography>
         <Box sx={{display:'flex', gap:2, mb:6}}>
-          <Button variant="contained" component={Link} to="/app/signin">Sign in</Button>
-          <Button variant="outlined" component={Link} to="/app">Open App</Button>
+          <Button variant="contained" component={Link} to="/app/signup">Start Free Trial</Button>
+          <Button variant="outlined" component={Link} to="/app/signin">Sign In</Button>
         </Box>
 
         <Typography variant="h5" sx={{mb:1}}>Request Access</Typography>

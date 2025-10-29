@@ -96,6 +96,25 @@ export default function LandingBCG() {
               >
                 Sign In
               </Button>
+              <Button
+                variant="contained"
+                onClick={() => navigate('/app/signup')}
+                sx={{
+                  bgcolor: '#1976d2',
+                  color: 'white',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  px: 3,
+                  boxShadow: 'none',
+                  '&:hover': {
+                    bgcolor: '#1565c0',
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
+                  }
+                }}
+              >
+                Start Free Trial
+              </Button>
             </Stack>
           </Stack>
         </Container>

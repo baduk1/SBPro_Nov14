@@ -95,7 +95,7 @@ export default function LandingApplyAI() {
                   }
                 }}
               >
-                Get Started
+                Start Free Trial
               </Button>
             </Stack>
           </Stack>

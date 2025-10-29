@@ -1,11 +1,12 @@
-import { Box, Button, Container, Grid, Stack, Typography, Card, CardContent, Chip } from '@mui/material'
+import { Box, Button, Container, Grid, Stack, Typography, Card, CardContent, Chip, AppBar, Toolbar } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import {
   CloudUpload as UploadIcon,
   Speed as SpeedIcon,
   AttachMoney as MoneyIcon,
   CheckCircle as CheckIcon,
-  ArrowForward as ArrowIcon
+  ArrowForward as ArrowIcon,
+  Login as LoginIcon
 } from '@mui/icons-material'
 
 export default function LandingNew() {
@@ -40,6 +41,75 @@ export default function LandingNew() {
 
   return (
     <Box>
+      {/* Header */}
+      <AppBar 
+        position="sticky" 
+        elevation={0}
+        sx={{ 
+          bgcolor: 'white',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+          {/* Logo */}
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 700,
+              color: '#667eea',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+            onClick={() => navigate('/')}
+          >
+            🏗️ SkyBuild Pro
+          </Typography>
+
+          {/* Auth Buttons */}
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="text"
+              onClick={() => navigate('/app/signin')}
+              startIcon={<LoginIcon />}
+              sx={{
+                color: 'text.primary',
+                fontWeight: 500,
+                textTransform: 'none',
+                fontSize: '1rem',
+                px: 2,
+                '&:hover': {
+                  bgcolor: 'rgba(102, 126, 234, 0.08)'
+                }
+              }}
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/app/signup')}
+              sx={{
+                bgcolor: '#667eea',
+                color: 'white',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem',
+                px: 3,
+                boxShadow: 'none',
+                '&:hover': {
+                  bgcolor: '#5568d3',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                }
+              }}
+            >
+              Start Free Trial
+            </Button>
+          </Stack>
+        </Toolbar>
+      </AppBar>
+
       {/* Hero Section */}
       <Box
         sx={{
