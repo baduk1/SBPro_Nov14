@@ -61,7 +61,7 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
         hash=get_password_hash(data.password),
         full_name=data.full_name,
         role=UserRole.USER.value,
-        email_verified=True,  # TEMPORARY: Auto-verify for testing (disable email check)
+        email_verified=False,  # ✅ Email verification required
         credits_balance=2000  # Free trial credits
     )
     db.add(new_user)
@@ -86,12 +86,16 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
     db.add(verification_token)
     db.commit()
 
-    # Send verification email (DISABLED FOR TESTING - SendGrid blocked)
-    # EmailService.send_verification_email(
-    #     to_email=new_user.email,
-    #     verification_token=verification_token.token,
-    #     user_name=new_user.full_name
-    # )
+    # ✅ Send verification email (IONOS SMTP)
+    try:
+        EmailService.send_verification_email(
+            to_email=new_user.email,
+            verification_token=verification_token.token,
+            user_name=new_user.full_name
+        )
+    except Exception as e:
+        # Log error but don't block registration
+        print(f"Warning: Failed to send verification email to {new_user.email}: {e}")
 
     return new_user
 
