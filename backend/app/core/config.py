@@ -18,13 +18,23 @@ class Settings(BaseSettings):
     # CORS
     USER_APP_ORIGIN: Optional[str] = os.getenv("USER_APP_ORIGIN")
     ADMIN_APP_ORIGIN: Optional[str] = os.getenv("ADMIN_APP_ORIGIN")
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ]
+    
+    # ✅ Localhost origins only in development mode
+    @property
+    def BACKEND_CORS_ORIGINS(self) -> List[str]:
+        """Return CORS origins based on environment"""
+        if self.ENV == "production":
+            # Production: no localhost origins
+            return []
+        else:
+            # Development: localhost for frontend dev servers
+            return [
+                "http://localhost:5173",      # User frontend (Vite)
+                "http://127.0.0.1:5173",
+                "http://localhost:5174",      # Admin frontend (Vite)
+                "http://127.0.0.1:5174",
+                "http://localhost",
+            ]
 
     # Database & storage
     DB_URL: str = os.getenv("DB_URL", "sqlite:///./boq.db")
