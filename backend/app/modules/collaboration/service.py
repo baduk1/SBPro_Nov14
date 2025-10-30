@@ -26,6 +26,8 @@ from app.modules.collaboration.schemas import (
 )
 from app.modules.collaboration.config import CollaborationConfig, SKYBUILD_COLLABORATION_CONFIG
 from app.models.user import User
+from app.models.project import Project
+from app.services.email import EmailService
 
 
 class CollaborationService:
@@ -188,6 +190,29 @@ class CollaborationService:
         db.add(invitation)
         db.commit()
         db.refresh(invitation)
+
+        # Send invitation email
+        # Get project and inviter details for the email
+        project = db.query(Project).filter(Project.id == project_id).first()
+        inviter = db.query(User).filter(User.id == invited_by_id).first()
+
+        project_name = project.name if project else "Unnamed Project"
+        inviter_name = inviter.full_name if (inviter and inviter.full_name) else "A team member"
+
+        # Send email (don't fail if email sending fails)
+        try:
+            EmailService.send_project_invitation_email(
+                to_email=email,
+                invitation_token=token,
+                project_name=project_name,
+                inviter_name=inviter_name,
+                role=role,
+                recipient_name=None  # We don't know their name yet
+            )
+        except Exception as e:
+            # Log but don't fail - invitation is created even if email fails
+            import logging
+            logging.error(f"Failed to send invitation email to {email}: {e}")
 
         return invitation, token
 
