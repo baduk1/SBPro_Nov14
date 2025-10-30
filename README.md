@@ -8,7 +8,7 @@ SkyBuild Pro is a modern web application for construction cost estimation, BOQ g
 
 ### Core Features
 - **User Authentication**: Email/password registration with email verification
-- **File Processing**: IFC, DWG, and PDF file uploads with automated BOQ extraction
+- **File Processing**: IFC, DWG, and PDF file uploads with BOQ extraction
 - **Templates System**: Reusable cost estimation templates with items and pricing
 - **Estimates Management**: Create detailed estimates with items, adjustments, and calculations
 - **Supplier Integration**: Manage suppliers and apply pricing from supplier catalogs

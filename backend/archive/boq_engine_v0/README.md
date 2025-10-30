@@ -49,4 +49,4 @@ df = run_takeoff(upload_path, "config/mapping.example.yml", price_path=None)
 - Swap DXF path with **ODA SDK** / **Autodesk Forge** microservice for 100% coverage.
 - Add **unit inference** from DXF header `$INSUNITS` and drawing scale (implemented baseline).
 - Extend IFC coverage to **valves, fittings, distribution boards** with properties (diameter, material).
-- Add **AI assist** (`engine.assist.ai_map`) to guess category for unknown layers (OpenAI API optional).
+- Add **pattern matching** for unknown layers to improve automatic categorization.

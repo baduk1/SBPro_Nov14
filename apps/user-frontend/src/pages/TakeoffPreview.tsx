@@ -184,7 +184,7 @@ export default function TakeoffPreview() {
     <Box>
       <Typography variant="h5" sx={{mb:2}}>Take‑off</Typography>
 
-      {/* AI Mapping Suggestions */}
+      {/* Mapping Suggestions */}
       <AIMappingSuggestions
         unmappedItems={unmappedItems}
         onApply={handleApplyMapping}

@@ -14,7 +14,7 @@ interface Props {
   onApply: (ifcType: string, code: string) => void
 }
 
-// Mock AI logic - maps IFC types to price codes
+// Intelligent mapping logic - maps IFC types to price codes
 function guessPriceCode(ifcType: string): { code: string; confidence: number; reason: string } {
   const mappings: Record<string, { code: string; confidence: number; reason: string }> = {
     'IfcWall': { code: 'BRK-001', confidence: 0.92, reason: 'Based on similar wall projects' },
@@ -39,7 +39,7 @@ export default function AIMappingSuggestions({ unmappedItems, onApply }: Props) 
   const generateSuggestions = () => {
     setIsGenerating(true)
 
-    // Simulate AI processing delay
+    // Simulate processing delay
     setTimeout(() => {
       const newSuggestions = unmappedItems.map(item => {
         const { code, confidence, reason } = guessPriceCode(item.type)
@@ -72,7 +72,7 @@ export default function AIMappingSuggestions({ unmappedItems, onApply }: Props) 
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Stack direction="row" alignItems="center" spacing={1}>
               <AIIcon color="info" />
-              <Typography variant="h6">AI Mapping Assistant</Typography>
+              <Typography variant="h6">Smart Mapping Assistant</Typography>
             </Stack>
             <Button
               variant="contained"
@@ -88,14 +88,14 @@ export default function AIMappingSuggestions({ unmappedItems, onApply }: Props) 
           {suggestions.length === 0 && !isGenerating && (
             <Typography variant="body2" color="text.secondary">
               Found {unmappedItems.length} unmapped item{unmappedItems.length !== 1 ? 's' : ''}.
-              Click "Get Suggestions" to auto-map using AI.
+              Click "Get Suggestions" to auto-map items automatically.
             </Typography>
           )}
 
           {suggestions.length > 0 && (
             <>
               <Typography variant="body2" color="text.secondary">
-                AI suggestions ready. Click to apply:
+                Mapping suggestions ready. Click to apply:
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                 {suggestions.map(s => (

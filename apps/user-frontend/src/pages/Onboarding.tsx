@@ -143,7 +143,7 @@ function WelcomeStep() {
                 </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">
-                Upload DWG/PDF drawings and automatically extract Bills of Quantities (BoQ) using AI-powered processing.
+                Upload DWG/PDF drawings and automatically extract Bills of Quantities (BoQ) using automated processing.
               </Typography>
             </CardContent>
           </Card>
@@ -286,7 +286,7 @@ function DemoStep() {
                     <Chip label="2" size="small" color="primary" />
                   </ListItemIcon>
                   <ListItemText
-                    primary="AI Extraction"
+                    primary="Automated Extraction"
                     secondary="System automatically extracts BoQ items from drawings"
                   />
                 </ListItem>

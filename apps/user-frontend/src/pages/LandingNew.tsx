@@ -17,7 +17,7 @@ export default function LandingNew() {
     {
       icon: <UploadIcon sx={{ fontSize: 48 }} color="primary" />,
       title: 'Automated Takeoff',
-      description: 'Upload IFC, DWG, DXF, or PDF files and extract quantities automatically using AI-powered recognition.'
+      description: 'Upload IFC, DWG, DXF, or PDF files and extract quantities automatically from construction documents.'
     },
     {
       icon: <SpeedIcon sx={{ fontSize: 48 }} color="success" />,
@@ -27,13 +27,13 @@ export default function LandingNew() {
     {
       icon: <MoneyIcon sx={{ fontSize: 48 }} color="warning" />,
       title: 'Accurate Pricing',
-      description: 'Apply your supplier price lists instantly. AI suggests matching codes to eliminate errors.'
+      description: 'Apply your supplier price lists instantly. Intelligent matching suggests codes to eliminate errors.'
     }
   ]
 
   const benefits = [
     'Extract quantities from BIM/CAD models in seconds',
-    'AI-powered element recognition and mapping',
+    'Automated element recognition and mapping',
     'Multi-supplier price comparison',
     'Export to CSV, Excel, or branded PDF',
     'Manage unlimited suppliers and price lists',
@@ -143,7 +143,7 @@ export default function LandingNew() {
               >
                 Construction Takeoff,
                 <br />
-                Automated with AI
+                Fully Automated
               </Typography>
               <Typography variant="h6" sx={{ mb: 4, opacity: 0.95, lineHeight: 1.7 }}>
                 Transform BIM and CAD files into accurate cost estimates in minutes.
@@ -216,7 +216,7 @@ export default function LandingNew() {
                       95%
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      Accuracy with AI matching
+                      Intelligent Matching
                     </Typography>
                   </Box>
                   <Box>
@@ -258,7 +258,7 @@ export default function LandingNew() {
             From Upload to Estimate in 3 Steps
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-            Our AI-powered platform handles the heavy lifting, so you can focus on winning projects.
+            Our automated platform handles the heavy lifting, so you can focus on winning projects.
           </Typography>
         </Box>
 
@@ -411,7 +411,7 @@ export default function LandingNew() {
                 SkyBuild Pro
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                AI-powered construction takeoff and estimation platform
+                Professional construction takeoff and estimation platform
               </Typography>
             </Grid>
             <Grid item xs={12} md={3}>

@@ -6,7 +6,7 @@
 - **Validation gates** before extraction (format, readability, unit inference, content sanity, mapping coverage).
 - **Pattern‑based mapping** (wildcards/regex) for DXF layers and block names; case‑insensitive.
 - **IFC improvements**: uses `IfcElementQuantity` when available; falls back to port geometry; supports **SanitaryTerminal, Pipe/Cable Segment, Outlet, Switch, Light, Boards, Valves, Fittings** (counts).
-- **DXF improvements**: length for LINE/LWPOLYLINE/POLYLINE/ARC/CIRCLE/**SPLINE**; unit scaling from `$INSUNITS`; optional **AI fallback** to guess category for unknown layers/blocks.
+- **DXF improvements**: length for LINE/LWPOLYLINE/POLYLINE/ARC/CIRCLE/**SPLINE**; unit scaling from `$INSUNITS`; pattern-based categorization for unknown layers/blocks.
 - **BoQ builder**: grouping; optional **price join** with line totals; columns kept deterministic.
 - **CLI**: `validate` and `takeoff` subcommands. Exports **CSV/XLSX**.
 - **Seams** for ODA/Forge or your future custom parser.

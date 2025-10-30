@@ -180,7 +180,7 @@ class EmailService:
                     <p><strong>Here's what you can do now:</strong></p>
                     <ul>
                         <li>Upload IFC, DWG, DXF, or PDF files</li>
-                        <li>Extract quantities automatically with AI</li>
+                        <li>Extract quantities automatically</li>
                         <li>Add your supplier price lists</li>
                         <li>Generate accurate cost estimates</li>
                         <li>Export to CSV, Excel, or branded PDF</li>
@@ -253,7 +253,7 @@ class EmailService:
                     <ul>
                         <li>2,000 free credits (≈10 projects)</li>
                         <li>1 supplier with unlimited price items</li>
-                        <li>AI-powered quantity takeoff</li>
+                        <li>Automated quantity takeoff</li>
                         <li>Export to CSV, Excel, and PDF</li>
                         <li>Email support</li>
                     </ul>
@@ -279,7 +279,7 @@ class EmailService:
         Your account includes:
         - 2,000 free credits (≈10 projects)
         - 1 supplier with unlimited price items
-        - AI-powered quantity takeoff
+        - Automated quantity takeoff
         - Export to CSV, Excel, and PDF
         - Email support
 

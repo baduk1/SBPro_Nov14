@@ -8,7 +8,7 @@ React + TypeScript + Vite frontend application for SkyBuild Pro construction cos
 - **Onboarding Wizard**: 3-step onboarding flow for new users
 - **Project Management**: Create and manage construction projects
 - **File Upload**: Upload IFC, DWG, and PDF files with progress tracking
-- **BOQ Generation**: Automated Bill of Quantities extraction
+- **BOQ Generation**: Bill of Quantities extraction from construction documents
 - **Templates**: Create and manage reusable cost estimation templates
 - **Estimates**: Detailed estimates with items and cost adjustments
 - **Supplier Management**: Manage suppliers and pricing catalogs
