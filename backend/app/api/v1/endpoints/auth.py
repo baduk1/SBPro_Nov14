@@ -152,9 +152,20 @@ def resend_verification(email: str, db: Session = Depends(get_db)):
     if user.email_verified:
         raise HTTPException(status_code=400, detail="Email already verified")
 
-    # TODO: Add server-side throttle (60s per email/IP)
-    # Check last_verification_sent_at or use in-memory cache
-
+    # ✅ Server-side throttle: enforce 60s cooldown
+    from datetime import datetime, timezone
+    
+    if user.last_verification_sent_at:
+        now = datetime.now(timezone.utc)
+        elapsed = (now - user.last_verification_sent_at).total_seconds()
+        
+        if elapsed < 60:
+            remaining = int(60 - elapsed)
+            raise HTTPException(
+                status_code=429,  # Too Many Requests
+                detail=f"Please wait {remaining} seconds before requesting another verification email"
+            )
+    
     # Create new verification token
     verification_token = EmailVerificationToken.create_token_with_expiry(
         user_id=user.id,
@@ -169,6 +180,10 @@ def resend_verification(email: str, db: Session = Depends(get_db)):
         verification_token=verification_token.token,
         user_name=user.full_name
     )
+    
+    # ✅ Update last sent timestamp to enforce throttle
+    user.last_verification_sent_at = datetime.now(timezone.utc)
+    db.commit()
 
     return {"message": "Verification email sent", "email": user.email}
 

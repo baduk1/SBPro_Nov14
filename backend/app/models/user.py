@@ -25,6 +25,7 @@ class User(Base):
     email_verified = Column(Boolean, default=False, nullable=False)
     credits_balance = Column(Integer, default=2000, nullable=False)  # Free trial: 2000 credits
     full_name = Column(String, nullable=True)
+    last_verification_sent_at = Column(DateTime(timezone=True), nullable=True)  # For throttling resend
 
     # Relationships
     suppliers = relationship("Supplier", back_populates="user")
