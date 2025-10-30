@@ -12,8 +12,17 @@ from sqlalchemy.exc import IntegrityError
 from app.models.boq_item import BoqItem
 from app.models.job import Job
 from app.models.user import User
+from app.models.project import Project
 
 logger = logging.getLogger(__name__)
+
+
+def get_project_id_from_job(db: Session, job_id: str) -> Optional[str]:
+    """Get project_id from job_id"""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job:
+        return job.project_id
+    return None
 
 
 class BoqValidationError(Exception):
@@ -88,12 +97,13 @@ class BoqService:
         return errors
 
     @staticmethod
-    def update_boq_item(
+    async def update_boq_item(
         db: Session,
         item_id: str,
         updates: Dict[str, Any],
         user: User,
-        check_concurrency: bool = True
+        check_concurrency: bool = True,
+        broadcast: bool = True
     ) -> Tuple[BoqItem, bool]:
         """
         Update a single BoQ item.
@@ -178,10 +188,28 @@ class BoqService:
         db.commit()
         db.refresh(item)
 
+        # Broadcast update via WebSocket if something changed
+        if was_modified and broadcast:
+            try:
+                from app.services.websocket import websocket_manager
+
+                # Get project_id from job
+                project_id = get_project_id_from_job(db, item.job_id)
+                if project_id:
+                    await websocket_manager.broadcast_boq_update(
+                        project_id=project_id,
+                        item_id=item_id,
+                        updates=updates,
+                        user_id=user.id
+                    )
+            except Exception as e:
+                # Don't fail the update if broadcast fails
+                logger.error(f"Failed to broadcast BoQ update: {e}")
+
         return item, was_modified
 
     @staticmethod
-    def bulk_update_boq_items(
+    async def bulk_update_boq_items(
         db: Session,
         updates: List[Dict[str, Any]],
         user: User
@@ -226,13 +254,14 @@ class BoqService:
                 # Create a copy without the id field
                 updates_without_id = {k: v for k, v in update_data.items() if k != "id"}
 
-                # Update item (with concurrency check)
-                item, was_modified = BoqService.update_boq_item(
+                # Update item (with concurrency check, but no broadcast per-item)
+                item, was_modified = await BoqService.update_boq_item(
                     db=db,
                     item_id=item_id,
                     updates=updates_without_id,
                     user=user,
-                    check_concurrency=True
+                    check_concurrency=True,
+                    broadcast=False  # Don't broadcast per-item, will broadcast batch
                 )
 
                 if was_modified:
@@ -268,6 +297,29 @@ class BoqService:
                 })
                 summary["skipped"] += 1
                 logger.error(f"Error updating item {item_id}: {e}")
+
+        # Broadcast bulk update summary via WebSocket
+        if summary["updated"] > 0:
+            try:
+                from app.services.websocket import websocket_manager
+
+                # Get project_id from first updated item
+                if summary["items"]:
+                    first_item = summary["items"][0]
+                    project_id = get_project_id_from_job(db, first_item.job_id)
+                    if project_id:
+                        # Broadcast bulk update event
+                        await websocket_manager.sio.emit('boq:bulk:updated', {
+                            'project_id': project_id,
+                            'summary': {
+                                'total': summary['total'],
+                                'updated': summary['updated'],
+                                'skipped': summary['skipped']
+                            },
+                            'updated_by': user.id
+                        }, room=f"project:{project_id}")
+            except Exception as e:
+                logger.error(f"Failed to broadcast bulk update: {e}")
 
         return summary
 

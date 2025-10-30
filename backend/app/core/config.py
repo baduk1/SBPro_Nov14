@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "SkyBuild Pro")
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
+    # Redis Configuration (for WebSocket pub/sub)
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_ENABLED: bool = os.getenv("REDIS_ENABLED", "false").lower() == "true"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

@@ -142,7 +142,7 @@ def get_boq(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
 
 
 @router.patch("/boq/items/{item_id}", response_model=BoqItemOut)
-def update_boq_item(
+async def update_boq_item(
     item_id: str,
     updates: BoqItemUpdate,
     user: User = Depends(current_user),
@@ -153,12 +153,14 @@ def update_boq_item(
 
     Supports optimistic concurrency control via `updated_at` field.
     If provided and doesn't match, returns 409 Conflict.
+
+    Broadcasts update via WebSocket to all connected users in the project.
     """
     try:
         # Convert to dict and remove None values
         update_data = updates.model_dump(exclude_unset=True)
 
-        item, was_modified = boq_service.update_boq_item(
+        item, was_modified = await boq_service.update_boq_item(
             db=db,
             item_id=item_id,
             updates=update_data,
@@ -193,7 +195,7 @@ def update_boq_item(
 
 
 @router.post("/boq/items/bulk", response_model=BoqBulkUpdateResponse)
-def bulk_update_boq_items(
+async def bulk_update_boq_items(
     request: BoqBulkUpdateRequest,
     user: User = Depends(current_user),
     db: Session = Depends(get_db)
@@ -203,11 +205,13 @@ def bulk_update_boq_items(
 
     Returns summary with counts of updated/skipped items and any errors.
     Supports optimistic concurrency control via `updated_at` field per item.
+
+    Broadcasts bulk update summary via WebSocket to all connected users in the project.
     """
     # Convert Pydantic models to dicts
     updates = [item.model_dump(exclude_unset=True) for item in request.items]
 
-    summary = boq_service.bulk_update_boq_items(
+    summary = await boq_service.bulk_update_boq_items(
         db=db,
         updates=updates,
         user=user
