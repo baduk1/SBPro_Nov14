@@ -31,6 +31,9 @@ export default function JobStatus() {
         <Button component={Link} to={`/app/jobs/${id}/takeoff`} variant="contained" disabled={!ready}>
           Open Take‑off
         </Button>
+        <Button component={Link} to={`/app/jobs/${id}/boq`} variant="outlined" disabled={!ready}>
+          Edit BoQ
+        </Button>
       </Stack>
     </Box>
   )

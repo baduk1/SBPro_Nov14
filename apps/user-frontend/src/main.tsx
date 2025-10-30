@@ -25,6 +25,7 @@ import EstimatesListNew from './pages/Estimates/EstimatesListNew'
 import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
 import ProjectCollaboration from './pages/Projects/ProjectCollaboration'
+import BoQEditor from './pages/Jobs/BoQEditor'
 
 import { ColorModeProvider } from './hooks/useColorMode'
 import { WebSocketProvider } from './contexts/WebSocketContext'
@@ -86,6 +87,7 @@ const router = createBrowserRouter([
           { path: 'upload', element: <Upload /> },
           { path: 'jobs/:id', element: <JobStatus /> },
           { path: 'jobs/:id/takeoff', element: <TakeoffPreview /> },
+          { path: 'jobs/:id/boq', element: <BoQEditor /> },
 
           // Suppliers
           { path: 'suppliers', element: <SuppliersList /> },
