@@ -8,6 +8,9 @@ from app.api.v1.router import api_router
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.error_handler import register_error_handlers
 
+# Import collaboration module
+from app.modules.collaboration import collaboration_router
+
 # Fail fast: SECRET_KEY must be set for staging/prod (and dev, если хочешь дисциплины)
 if not settings.SECRET_KEY or settings.SECRET_KEY.strip() in ("", "CHANGE_ME_SUPER_SECRET"):
     raise RuntimeError("SECRET_KEY must be set via env. Month-2 production foundation requires secure secrets.")
@@ -49,7 +52,11 @@ app.add_middleware(RateLimitMiddleware, calls=100, period=60)
 # Register error handlers
 register_error_handlers(app)
 
+# Mount API routers
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+# Mount collaboration module (reusable)
+app.include_router(collaboration_router, prefix=settings.API_V1_PREFIX, tags=["collaboration"])
 
 
 @app.get("/healthz")

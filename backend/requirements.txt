@@ -18,3 +18,22 @@ ifcopenshell>=0.7.0
 ezdxf>=1.0,<2.0
 pandas>=2.2.0
 PyYAML>=6.0
+
+# Database migrations
+alembic==1.13.1
+
+# Email (will be used for invitations in Phase 2)
+aiosmtplib==3.0.1
+email-validator==2.1.1
+
+# Redis and real-time features (for Phase 2)
+# redis==5.0.1
+# python-socketio[asyncio]==5.11.0
+# rq==1.16.1
+
+# Notion integration (for Phase 2)
+# notion-client==2.2.1
+
+# Encryption for tokens
+cryptography==42.0.5
+itsdangerous==2.1.2
