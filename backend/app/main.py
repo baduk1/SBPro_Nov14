@@ -8,8 +8,9 @@ from app.api.v1.router import api_router
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.error_handler import register_error_handlers
 
-# Import collaboration module
+# Import reusable modules
 from app.modules.collaboration import collaboration_router
+from app.modules.tasks import tasks_router
 
 # Fail fast: SECRET_KEY must be set for staging/prod (and dev, если хочешь дисциплины)
 if not settings.SECRET_KEY or settings.SECRET_KEY.strip() in ("", "CHANGE_ME_SUPER_SECRET"):
@@ -55,8 +56,9 @@ register_error_handlers(app)
 # Mount API routers
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
-# Mount collaboration module (reusable)
+# Mount reusable modules
 app.include_router(collaboration_router, prefix=settings.API_V1_PREFIX, tags=["collaboration"])
+app.include_router(tasks_router, prefix=settings.API_V1_PREFIX, tags=["tasks", "project-management"])
 
 
 @app.get("/healthz")

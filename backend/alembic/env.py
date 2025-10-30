@@ -19,13 +19,20 @@ from app.models.base import Base
 # Use db.base which already imports all models
 from app.db.base import Base as _ # This triggers all model imports
 
-# Also import collaboration models explicitly
+# Also import module models explicitly
 from app.modules.collaboration.models import (
     ProjectCollaborator,
     ProjectInvitation,
     Comment,
     Activity,
     Notification
+)
+
+from app.modules.tasks.models import (
+    Task,
+    TaskRevision,
+    TaskDependency,
+    TaskAttachment
 )
 
 # this is the Alembic Config object, which provides
