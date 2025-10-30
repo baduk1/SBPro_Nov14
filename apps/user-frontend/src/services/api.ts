@@ -491,4 +491,130 @@ export const projects = {
   },
 }
 
+// Collaboration types
+export interface Collaborator {
+  id: number
+  project_id: string
+  user_id: string
+  role: 'owner' | 'editor' | 'viewer'
+  invited_by: string
+  invited_at: string
+  accepted_at: string | null
+  user_email?: string
+  user_name?: string
+}
+
+export interface ProjectInvitation {
+  id: number
+  project_id: string
+  email: string
+  role: 'editor' | 'viewer'
+  status: 'pending' | 'accepted' | 'expired' | 'revoked'
+  invited_by: string
+  expires_at: string | null
+  created_at: string
+}
+
+export interface InviteUserRequest {
+  email: string
+  role: 'editor' | 'viewer'
+}
+
+// Collaboration API
+export const collaboration = {
+  // Collaborators
+  listCollaborators: async (projectId: string) => {
+    const res = await api.get<Collaborator[]>(`/projects/${projectId}/collaborators`)
+    return res.data
+  },
+  addCollaborator: async (projectId: string, userId: string, role: string) => {
+    const res = await api.post<Collaborator>(`/projects/${projectId}/collaborators`, {
+      user_id: userId,
+      role,
+    })
+    return res.data
+  },
+  updateCollaboratorRole: async (projectId: string, collaboratorId: number, role: string) => {
+    const res = await api.patch<Collaborator>(`/projects/${projectId}/collaborators/${collaboratorId}`, {
+      role,
+    })
+    return res.data
+  },
+  removeCollaborator: async (projectId: string, collaboratorId: number) => {
+    await api.delete(`/projects/${projectId}/collaborators/${collaboratorId}`)
+  },
+
+  // Invitations
+  inviteUser: async (projectId: string, data: InviteUserRequest) => {
+    const res = await api.post<ProjectInvitation>(`/projects/${projectId}/invite`, data)
+    return res.data
+  },
+  acceptInvitation: async (token: string) => {
+    const res = await api.post<Collaborator>('/join-project', { token })
+    return res.data
+  },
+}
+
+// Tasks API
+export interface Task {
+  id: number
+  project_id: string
+  title: string
+  description: string | null
+  status: string
+  priority: string | null
+  assignee_id: string | null
+  due_date: string | null
+  start_date: string | null
+  type: string | null
+  labels: string[]
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+export interface TaskFilter {
+  status?: string
+  assignee?: string
+  q?: string
+  page?: number
+  limit?: number
+}
+
+export interface ProjectKPIs {
+  total_tasks: number
+  tasks_by_status: Record<string, number>
+  tasks_by_priority: Record<string, number>
+  overdue_tasks: number
+  due_this_week: number
+  due_next_week: number
+  completion_percentage: number
+}
+
+export const tasks = {
+  list: async (projectId: string, filter?: TaskFilter) => {
+    const res = await api.get<Task[]>(`/projects/${projectId}/tasks`, { params: filter })
+    return res.data
+  },
+  get: async (taskId: number) => {
+    const res = await api.get<Task>(`/tasks/${taskId}`)
+    return res.data
+  },
+  create: async (projectId: string, data: Partial<Task>) => {
+    const res = await api.post<Task>(`/projects/${projectId}/tasks`, data)
+    return res.data
+  },
+  update: async (taskId: number, data: Partial<Task>) => {
+    const res = await api.patch<Task>(`/tasks/${taskId}`, data)
+    return res.data
+  },
+  delete: async (taskId: number) => {
+    await api.delete(`/tasks/${taskId}`)
+  },
+  getKPIs: async (projectId: string) => {
+    const res = await api.get<ProjectKPIs>(`/projects/${projectId}/dashboard`)
+    return res.data
+  },
+}
+
 export default api

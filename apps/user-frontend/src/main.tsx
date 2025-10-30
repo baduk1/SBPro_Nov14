@@ -26,6 +26,7 @@ import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
 
 import { ColorModeProvider } from './hooks/useColorMode'
+import { WebSocketProvider } from './contexts/WebSocketContext'
 
 // ✅ Light theme for public pages (landing, verify-email, onboarding)
 const lightTheme = createTheme({
@@ -45,12 +46,16 @@ function PublicLayout() {
   )
 }
 
-// Wrapper for app routes (with dark mode toggle)
+// Wrapper for app routes (with dark mode toggle and WebSocket)
 function AppLayout() {
+  const token = localStorage.getItem('token') || undefined
+
   return (
     <ColorModeProvider>
-      <CssBaseline />
-      <Outlet />
+      <WebSocketProvider token={token} autoConnect={!!token}>
+        <CssBaseline />
+        <Outlet />
+      </WebSocketProvider>
     </ColorModeProvider>
   )
 }
