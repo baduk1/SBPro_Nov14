@@ -24,6 +24,7 @@ import TemplateDetailsNew from './pages/Templates/TemplateDetailsNew'
 import EstimatesListNew from './pages/Estimates/EstimatesListNew'
 import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
+import ProjectCollaboration from './pages/Projects/ProjectCollaboration'
 
 import { ColorModeProvider } from './hooks/useColorMode'
 import { WebSocketProvider } from './contexts/WebSocketContext'
@@ -101,6 +102,7 @@ const router = createBrowserRouter([
 
           // Projects
           { path: 'projects/:id/history', element: <ProjectHistory /> },
+          { path: 'projects/:id/team', element: <ProjectCollaboration /> },
         ],
       },
     ],

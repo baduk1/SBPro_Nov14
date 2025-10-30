@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
@@ -18,7 +19,8 @@ import {
   NoteAdd as NoteAddIcon,
   Edit as EditIcon,
   CloudUpload as CloudUploadIcon,
-  PlayArrow as PlayArrowIcon
+  PlayArrow as PlayArrowIcon,
+  Groups as GroupsIcon
 } from '@mui/icons-material'
 import { projects } from '../../services/api'
 
@@ -98,7 +100,7 @@ export default function ProjectHistory() {
         <IconButton onClick={() => navigate('/app/dashboard')}>
           <ArrowBackIcon />
         </IconButton>
-        <Box>
+        <Box flex={1}>
           <Typography variant="h4">
             Project History
           </Typography>
@@ -106,6 +108,13 @@ export default function ProjectHistory() {
             Timeline of all project events
           </Typography>
         </Box>
+        <Button
+          variant="outlined"
+          startIcon={<GroupsIcon />}
+          onClick={() => navigate(`/app/projects/${id}/team`)}
+        >
+          Team
+        </Button>
       </Stack>
 
       <Stack spacing={2}>
