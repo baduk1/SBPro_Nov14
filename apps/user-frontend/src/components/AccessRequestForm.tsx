@@ -3,7 +3,8 @@ import {
   Box,
   Button,
   TextField,
-  Typography
+  Typography,
+  Alert
 } from '@mui/material'
 import api from '../services/api'
 
@@ -13,15 +14,16 @@ export default function AccessRequestForm() {
   const [company, setCompany] = useState('')
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const submit = async () => {
+    setError('')
     try {
       await api.post('/public/access-requests', { name, email, company, message })
       setSubmitted(true)
-    } catch (error) {
-      console.error('Failed to submit access request:', error)
-      // Show error to user
-      alert('Failed to submit request. Please try again.')
+    } catch (err: any) {
+      console.error('Failed to submit access request:', err)
+      setError(err?.response?.data?.detail || 'Failed to submit request. Please try again.')
     }
   }
 
@@ -36,6 +38,7 @@ export default function AccessRequestForm() {
 
   return (
     <>
+      {error && <Alert severity="error" sx={{mt:2, mb:2}}>{error}</Alert>}
       <Box sx={{display:'grid', gap:2, maxWidth:560}}>
         <TextField
           label="Name"

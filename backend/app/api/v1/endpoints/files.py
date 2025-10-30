@@ -62,10 +62,49 @@ async def upload_content(
         verify_presigned("upload", file_id, exp, sig)
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e))
+    
+    # ✅ Read body with size limit (100 MB)
+    MAX_SIZE = 100 * 1024 * 1024  # 100 MB
     dest = uploads_path(file_id)
     body = await request.body()
+    
+    # ✅ Check file size
+    if len(body) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail=f"File too large. Maximum size is 100 MB.")
+    
+    if len(body) == 0:
+        raise HTTPException(status_code=400, detail="Empty file")
+    
+    # ✅ Validate magic bytes based on file type
+    file_type = f.type.upper()
+    magic_valid = True
+    error_msg = ""
+    
+    if file_type == "PDF":
+        # PDF files start with %PDF-
+        if not body.startswith(b'%PDF-'):
+            magic_valid = False
+            error_msg = "Invalid PDF file: missing PDF header"
+    
+    elif file_type == "IFC":
+        # IFC files start with ISO-10303-21
+        if not body.startswith(b'ISO-10303-21'):
+            magic_valid = False
+            error_msg = "Invalid IFC file: missing ISO-10303-21 header"
+    
+    elif file_type == "DWG":
+        # DWG files start with AC followed by version (e.g., AC1027, AC1032)
+        if not body.startswith(b'AC'):
+            magic_valid = False
+            error_msg = "Invalid DWG file: missing AC header"
+    
+    if not magic_valid:
+        raise HTTPException(status_code=400, detail=error_msg)
+    
+    # Write file
     with open(dest, "wb") as out:
         out.write(body)
+    
     f.size = os.path.getsize(dest)
     db.commit()
     return {"uploaded": True, "size": f.size}

@@ -20,39 +20,17 @@ export default function AdminAccessRequests() {
 
   const load = async () => {
     try {
-      // Try backend first, fallback to localStorage mock
+      // ✅ Load from backend (no mock fallback)
       const res = await api.get<AccessRequest[]>('/admin/access-requests')
       setRows(res.data)
-    } catch (error) {
-      // Fallback to mock data from localStorage
-      const mockData = localStorage.getItem('accessRequests')
-      if (mockData) {
-        setRows(JSON.parse(mockData))
-      } else {
-        // Initialize with sample data
-        const sampleData: AccessRequest[] = [
-          {
-            id: '1',
-            name: 'Ivan Petrov',
-            email: 'ivan@buildco.ru',
-            company: 'BuildCo Ltd',
-            message: 'Looking for estimating tool for our construction projects',
-            status: 'new',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            name: 'Maria Ivanova',
-            email: 'maria@contractor.com',
-            company: 'Elite Contractors',
-            message: 'Need automated takeoff solution',
-            status: 'new',
-            created_at: new Date(Date.now() - 86400000).toISOString()
-          }
-        ]
-        localStorage.setItem('accessRequests', JSON.stringify(sampleData))
-        setRows(sampleData)
-      }
+    } catch (error: any) {
+      console.error('Failed to load access requests:', error)
+      setSnackbar({
+        open: true,
+        message: error?.response?.data?.detail || 'Failed to load access requests',
+        severity: 'error'
+      })
+      setRows([])
     }
   }
 
@@ -65,21 +43,43 @@ export default function AdminAccessRequests() {
       await api.patch(`/admin/access-requests/${id}`, { status })
       await load()
       setSnackbar({ open: true, message: `Request ${status}`, severity: 'success' })
-    } catch (error) {
-      // Fallback to localStorage
-      const updated = rows.map(r => r.id === id ? { ...r, status } : r)
-      setRows(updated)
-      localStorage.setItem('accessRequests', JSON.stringify(updated))
+    } catch (error: any) {
+      console.error('Failed to update status:', error)
       setSnackbar({
         open: true,
-        message: `Request ${status} (mock mode - email notification would be sent)`,
-        severity: 'success'
+        message: error?.response?.data?.detail || 'Failed to update request status',
+        severity: 'error'
       })
     }
   }
 
-  const handleApprove = (id: string) => {
-    updateStatus(id, 'approved')
+  const handleApprove = async (id: string) => {
+    try {
+      // ✅ Call the /approve endpoint which creates user and sends invite email
+      const response = await api.post(`/admin/access-requests/${id}/approve`)
+      await load()
+      
+      setSnackbar({
+        open: true,
+        message: response.data.message || 'Request approved and invite sent',
+        severity: 'success'
+      })
+    } catch (error: any) {
+      console.error('Failed to approve request:', error)
+      
+      let errorMessage = 'Failed to approve request'
+      if (error?.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error?.response?.status === 409) {
+        errorMessage = 'User already exists or request already approved'
+      }
+      
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: 'error'
+      })
+    }
   }
 
   const handleReject = (id: string) => {
