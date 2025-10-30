@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CssBaseline } from '@mui/material'
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 import LandingNew from './pages/LandingNew'
 import Shell from './App'
@@ -27,37 +27,77 @@ import ProjectHistory from './pages/Projects/ProjectHistory'
 
 import { ColorModeProvider } from './hooks/useColorMode'
 
+// ✅ Light theme for public pages (landing, verify-email, onboarding)
+const lightTheme = createTheme({
+  palette: { mode: 'light' },
+  typography: {
+    fontFamily: '"IBM Plex Sans", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+  },
+})
+
+// Wrapper for public routes (always light theme)
+function PublicLayout() {
+  return (
+    <ThemeProvider theme={lightTheme}>
+      <CssBaseline />
+      <Outlet />
+    </ThemeProvider>
+  )
+}
+
+// Wrapper for app routes (with dark mode toggle)
+function AppLayout() {
+  return (
+    <ColorModeProvider>
+      <CssBaseline />
+      <Outlet />
+    </ColorModeProvider>
+  )
+}
+
 const router = createBrowserRouter([
-  { path: '/', element: <LandingNew /> },
-  { path: '/verify-email', element: <VerifyEmail /> },
-  { path: '/onboarding', element: <Onboarding /> },
   {
-    path: '/app',
-    element: <Shell />,
+    // ✅ Public routes - always light theme
+    element: <PublicLayout />,
     children: [
-      { path: '', element: <Navigate to="dashboard" /> },
-      { path: 'dashboard', element: <Dashboard /> },
-      { path: 'signin', element: <SignIn /> },
-      { path: 'signup', element: <SignUp /> },
-      { path: 'upload', element: <Upload /> },
-      { path: 'jobs/:id', element: <JobStatus /> },
-      { path: 'jobs/:id/takeoff', element: <TakeoffPreview /> },
+      { path: '/', element: <LandingNew /> },
+      { path: '/verify-email', element: <VerifyEmail /> },
+      { path: '/onboarding', element: <Onboarding /> },
+    ],
+  },
+  {
+    // ✅ App routes - with dark mode toggle
+    path: '/app',
+    element: <AppLayout />,
+    children: [
+      {
+        element: <Shell />,
+        children: [
+          { path: '', element: <Navigate to="dashboard" /> },
+          { path: 'dashboard', element: <Dashboard /> },
+          { path: 'signin', element: <SignIn /> },
+          { path: 'signup', element: <SignUp /> },
+          { path: 'upload', element: <Upload /> },
+          { path: 'jobs/:id', element: <JobStatus /> },
+          { path: 'jobs/:id/takeoff', element: <TakeoffPreview /> },
 
-      // Suppliers
-      { path: 'suppliers', element: <SuppliersList /> },
-      { path: 'suppliers/new', element: <SupplierCreate /> },
-      { path: 'suppliers/:id', element: <SupplierDetails /> },
+          // Suppliers
+          { path: 'suppliers', element: <SuppliersList /> },
+          { path: 'suppliers/new', element: <SupplierCreate /> },
+          { path: 'suppliers/:id', element: <SupplierDetails /> },
 
-      // Templates
-      { path: 'templates', element: <TemplatesListNew /> },
-      { path: 'templates/:id', element: <TemplateDetailsNew /> },
+          // Templates
+          { path: 'templates', element: <TemplatesListNew /> },
+          { path: 'templates/:id', element: <TemplateDetailsNew /> },
 
-      // Estimates
-      { path: 'estimates', element: <EstimatesListNew /> },
-      { path: 'estimates/:id', element: <EstimateDetailsNew /> },
+          // Estimates
+          { path: 'estimates', element: <EstimatesListNew /> },
+          { path: 'estimates/:id', element: <EstimateDetailsNew /> },
 
-      // Projects
-      { path: 'projects/:id/history', element: <ProjectHistory /> },
+          // Projects
+          { path: 'projects/:id/history', element: <ProjectHistory /> },
+        ],
+      },
     ],
   },
 ])
@@ -67,10 +107,7 @@ const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ColorModeProvider>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ColorModeProvider>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </React.StrictMode>,
 )
