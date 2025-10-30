@@ -10,8 +10,15 @@ from app.models.boq_item import BoqItem
 from app.models.price_list import PriceList
 from app.models.supplier import Supplier, SupplierPriceItem
 from app.models.user import User
-from app.schemas.boq import BoqItemOut
+from app.schemas.boq import (
+    BoqItemOut,
+    BoqItemUpdate,
+    BoqBulkUpdateRequest,
+    BoqBulkUpdateResponse,
+    BoqValidationReport
+)
 from app.services.pricing import apply_prices
+from app.services.boq import boq_service, BoqConcurrencyError, BoqValidationError
 
 router = APIRouter()
 
@@ -132,3 +139,102 @@ def get_boq(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Job not found")
 
     return db.query(BoqItem).filter(BoqItem.job_id == id).all()
+
+
+@router.patch("/boq/items/{item_id}", response_model=BoqItemOut)
+def update_boq_item(
+    item_id: str,
+    updates: BoqItemUpdate,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update a single BoQ item.
+
+    Supports optimistic concurrency control via `updated_at` field.
+    If provided and doesn't match, returns 409 Conflict.
+    """
+    try:
+        # Convert to dict and remove None values
+        update_data = updates.model_dump(exclude_unset=True)
+
+        item, was_modified = boq_service.update_boq_item(
+            db=db,
+            item_id=item_id,
+            updates=update_data,
+            user=user,
+            check_concurrency=True
+        )
+
+        return item
+
+    except BoqConcurrencyError as e:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "error": "Concurrency conflict",
+                "message": "Item was modified by another user",
+                "item_id": e.item_id,
+                "expected_version": e.expected_version,
+                "actual_version": e.actual_version
+            }
+        )
+
+    except BoqValidationError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "Validation error",
+                "field": e.field,
+                "message": e.message,
+                "item_id": e.item_id
+            }
+        )
+
+
+@router.post("/boq/items/bulk", response_model=BoqBulkUpdateResponse)
+def bulk_update_boq_items(
+    request: BoqBulkUpdateRequest,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Bulk update multiple BoQ items.
+
+    Returns summary with counts of updated/skipped items and any errors.
+    Supports optimistic concurrency control via `updated_at` field per item.
+    """
+    # Convert Pydantic models to dicts
+    updates = [item.model_dump(exclude_unset=True) for item in request.items]
+
+    summary = boq_service.bulk_update_boq_items(
+        db=db,
+        updates=updates,
+        user=user
+    )
+
+    return summary
+
+
+@router.get("/{id}/boq/validate", response_model=BoqValidationReport)
+def validate_boq(
+    id: str,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Validate integrity of all BoQ items for a job.
+
+    Checks:
+    - Missing required fields
+    - Invalid numeric values (negative)
+    - Total price calculations
+    - Duplicate codes
+    """
+    report = boq_service.validate_boq_integrity(
+        db=db,
+        job_id=id,
+        user=user
+    )
+
+    return report

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, ForeignKey, Float
+from sqlalchemy import Column, String, ForeignKey, Float, DateTime
+from sqlalchemy.sql import func
 from uuid import uuid4
 
 from app.models.base import Base
@@ -17,3 +18,5 @@ class BoqItem(Base):
     allowance_amount = Column(Float, default=0.0)
     unit_price = Column(Float, default=0.0)  # Price per unit
     total_price = Column(Float, default=0.0)  # qty * unit_price
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
