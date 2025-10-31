@@ -233,7 +233,9 @@ class WebSocketService {
    */
   onBoqUpdate(callback: (data: BoqUpdateEvent) => void) {
     this.socket?.on('boq:item:updated', callback);
-    return () => this.socket?.off('boq:item:updated', callback);
+    return () => {
+      this.socket?.off('boq:item:updated', callback);
+    };
   }
 
   /**
@@ -241,7 +243,9 @@ class WebSocketService {
    */
   onBoqBulkUpdate(callback: (data: BoqBulkUpdateEvent) => void) {
     this.socket?.on('boq:bulk:updated', callback);
-    return () => this.socket?.off('boq:bulk:updated', callback);
+    return () => {
+      this.socket?.off('boq:bulk:updated', callback);
+    };
   }
 
   /**
@@ -249,7 +253,9 @@ class WebSocketService {
    */
   onTaskUpdate(callback: (data: TaskUpdateEvent) => void) {
     this.socket?.on('task:updated', callback);
-    return () => this.socket?.off('task:updated', callback);
+    return () => {
+      this.socket?.off('task:updated', callback);
+    };
   }
 
   /**
@@ -257,7 +263,9 @@ class WebSocketService {
    */
   onCommentCreated(callback: (data: CommentCreatedEvent) => void) {
     this.socket?.on('comment:created', callback);
-    return () => this.socket?.off('comment:created', callback);
+    return () => {
+      this.socket?.off('comment:created', callback);
+    };
   }
 
   /**
@@ -265,7 +273,9 @@ class WebSocketService {
    */
   onNotification(callback: (data: NotificationEvent) => void) {
     this.socket?.on('notification:new', callback);
-    return () => this.socket?.off('notification:new', callback);
+    return () => {
+      this.socket?.off('notification:new', callback);
+    };
   }
 
   /**

@@ -25,6 +25,7 @@ import EstimatesListNew from './pages/Estimates/EstimatesListNew'
 import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
 import ProjectCollaboration from './pages/Projects/ProjectCollaboration'
+import ProjectTasks from './pages/Projects/ProjectTasks'
 import BoQEditor from './pages/Jobs/BoQEditor'
 
 import { ColorModeProvider } from './hooks/useColorMode'
@@ -105,6 +106,7 @@ const router = createBrowserRouter([
           // Projects
           { path: 'projects/:id/history', element: <ProjectHistory /> },
           { path: 'projects/:id/team', element: <ProjectCollaboration /> },
+          { path: 'projects/:id/tasks', element: <ProjectTasks /> },
         ],
       },
     ],

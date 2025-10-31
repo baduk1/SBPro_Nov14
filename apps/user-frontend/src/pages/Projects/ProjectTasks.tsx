@@ -1,11 +1,11 @@
 /**
- * Project Collaboration Page
+ * Project Tasks Page
  *
- * Main page for managing project team members and invitations.
- * Shows real-time user presence and allows inviting new members.
+ * Main page for viewing and managing project tasks.
+ * Features task list with filters and task editor dialog.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -17,29 +17,24 @@ import {
   Snackbar,
   Breadcrumbs,
   Link,
-  Grid,
   Stack,
+  Chip,
 } from '@mui/material';
-import { ArrowBack, Groups, Assignment, History } from '@mui/icons-material';
+import { ArrowBack, Assignment, Groups, CheckCircle, History } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { projects } from '../../services/api';
-import { auth } from '../../services/api';
-import CollaboratorsPanel from '../../components/CollaboratorsPanel';
-import PendingInvitations from '../../components/PendingInvitations';
 import { useProjectRoom, useWebSocket } from '../../contexts/WebSocketContext';
+import TaskList from '../../components/TaskList';
+import TaskEditor from '../../components/TaskEditor';
 
-export default function ProjectCollaboration() {
+export default function ProjectTasks() {
   const { id: projectId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isConnected } = useWebSocket();
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Fetch current user
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => auth.me(),
-  });
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
 
   // Fetch project details
   const { data: project, isLoading: projectLoading } = useQuery({
@@ -59,9 +54,28 @@ export default function ProjectCollaboration() {
     setSuccessMessage(message);
   };
 
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setEditorOpen(true);
+  };
+
+  const handleCreateTask = () => {
+    setSelectedTaskId(undefined);
+    setEditorOpen(true);
+  };
+
+  const handleEditorClose = () => {
+    setEditorOpen(false);
+    setSelectedTaskId(undefined);
+  };
+
+  const handleEditorSuccess = () => {
+    handleSuccess(selectedTaskId ? 'Task updated successfully' : 'Task created successfully');
+  };
+
   if (!projectId) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error">Project ID not found</Alert>
       </Container>
     );
@@ -91,7 +105,7 @@ export default function ProjectCollaboration() {
             </Link>
           )}
           <Typography variant="body2" color="text.primary">
-            Team
+            Tasks
           </Typography>
         </Breadcrumbs>
 
@@ -105,10 +119,10 @@ export default function ProjectCollaboration() {
           </Button>
           <Box flex={1}>
             <Box display="flex" alignItems="center" gap={1.5}>
-              <Groups sx={{ fontSize: 32 }} color="primary" />
+              <Assignment sx={{ fontSize: 32 }} color="primary" />
               <Box>
                 <Typography variant="h4" component="h1">
-                  Team Collaboration
+                  Project Tasks
                 </Typography>
                 {project && (
                   <Typography variant="body2" color="text.secondary">
@@ -127,63 +141,52 @@ export default function ProjectCollaboration() {
           </Button>
           <Button
             variant="outlined"
-            startIcon={<Assignment />}
-            onClick={() => navigate(`/app/projects/${projectId}/tasks`)}
+            startIcon={<Groups />}
+            onClick={() => navigate(`/app/projects/${projectId}/team`)}
           >
-            Tasks
+            Team
           </Button>
         </Stack>
 
-        {/* Connection Status */}
+        {/* Status Bar */}
+        <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Chip
+            icon={isConnected ? <CheckCircle /> : undefined}
+            label={isConnected ? 'Real-time sync active' : 'Offline mode'}
+            color={isConnected ? 'success' : 'default'}
+            size="small"
+          />
+          {!isConnected && (
+            <Typography variant="caption" color="text.secondary">
+              Tasks will sync when connection is restored
+            </Typography>
+          )}
+        </Paper>
+
+        {/* Connection Warning */}
         {!isConnected && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            Real-time updates unavailable - connection lost. Team presence may not be accurate.
+            Real-time updates unavailable - connection lost. You can still view and edit tasks.
           </Alert>
         )}
       </Box>
 
-      {/* Main Content */}
-      <Grid container spacing={3}>
-        {/* Collaborators Panel */}
-        <Grid item xs={12} md={8}>
-          <CollaboratorsPanel
-            projectId={projectId}
-            currentUserId={currentUser?.id}
-            onError={handleError}
-          />
-        </Grid>
+      {/* Task List */}
+      <TaskList
+        projectId={projectId}
+        onTaskClick={handleTaskClick}
+        onCreateTask={handleCreateTask}
+      />
 
-        {/* Sidebar */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, mb: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              About Collaboration
-            </Typography>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              Invite team members to collaborate on this project. They'll receive an email with a link
-              to join.
-            </Typography>
-
-            <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-              Roles:
-            </Typography>
-            <Box component="ul" sx={{ pl: 2, mt: 1 }}>
-              <Typography component="li" variant="body2" paragraph>
-                <strong>Owner:</strong> Full control, can manage team members
-              </Typography>
-              <Typography component="li" variant="body2" paragraph>
-                <strong>Editor:</strong> Can view and edit all project data
-              </Typography>
-              <Typography component="li" variant="body2">
-                <strong>Viewer:</strong> Can view but cannot edit
-              </Typography>
-            </Box>
-          </Paper>
-
-          {/* Pending Invitations */}
-          <PendingInvitations projectId={projectId} onError={handleError} />
-        </Grid>
-      </Grid>
+      {/* Task Editor Dialog */}
+      <TaskEditor
+        open={editorOpen}
+        projectId={projectId}
+        taskId={selectedTaskId}
+        onClose={handleEditorClose}
+        onSuccess={handleEditorSuccess}
+        onError={handleError}
+      />
 
       {/* Error Snackbar */}
       <Snackbar

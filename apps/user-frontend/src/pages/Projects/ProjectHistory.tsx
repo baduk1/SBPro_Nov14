@@ -20,7 +20,8 @@ import {
   Edit as EditIcon,
   CloudUpload as CloudUploadIcon,
   PlayArrow as PlayArrowIcon,
-  Groups as GroupsIcon
+  Groups as GroupsIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material'
 import { projects } from '../../services/api'
 
@@ -108,6 +109,13 @@ export default function ProjectHistory() {
             Timeline of all project events
           </Typography>
         </Box>
+        <Button
+          variant="outlined"
+          startIcon={<AssignmentIcon />}
+          onClick={() => navigate(`/app/projects/${id}/tasks`)}
+        >
+          Tasks
+        </Button>
         <Button
           variant="outlined"
           startIcon={<GroupsIcon />}
