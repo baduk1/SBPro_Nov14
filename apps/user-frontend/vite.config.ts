@@ -10,5 +10,14 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress MUI date picker warnings about missing @mui/material/version
+        if (warning.code === 'UNRESOLVED_IMPORT' && warning.message.includes('@mui/material/version')) {
+          return;
+        }
+        warn(warning);
+      },
+    },
   },
 })
