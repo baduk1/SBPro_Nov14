@@ -9,11 +9,11 @@ import math
 
 @dataclass
 class BoqRow:
-    code: str | None
+    code: Optional[str]
     description: str
     unit: str
     qty: float
-    source_ref: str | None = None
+    source_ref: Optional[str] = None
 
 # --- helpers ---------------------------------------------------------------
 

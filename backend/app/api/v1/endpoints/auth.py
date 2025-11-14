@@ -61,41 +61,41 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
         hash=get_password_hash(data.password),
         full_name=data.full_name,
         role=UserRole.USER.value,
-        email_verified=False,  # ✅ Email verification required
+        email_verified=True,  # ✅ Auto-verified (SMTP not configured)
         credits_balance=2000  # Free trial credits
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    # Create default project for the user (required for file uploads)
-    # Generate unique project ID (UUID)
-    default_project = Project(
-        owner_id=new_user.id,
-        name='My First Project'
-    )
-    db.add(default_project)
-    db.commit()
-    db.refresh(default_project)
+    # Create default project for the user (DISABLED - users should create projects manually or be invited)
+    # default_project = Project(
+    #     owner_id=new_user.id,
+    #     name='My First Project'
+    # )
+    # db.add(default_project)
+    # db.commit()
+    # db.refresh(default_project)
 
+    # Email verification disabled (SMTP not configured)
     # Create verification token
-    verification_token = EmailVerificationToken.create_token_with_expiry(
-        user_id=new_user.id,
-        hours=24
-    )
-    db.add(verification_token)
-    db.commit()
+    # verification_token = EmailVerificationToken.create_token_with_expiry(
+    #     user_id=new_user.id,
+    #     hours=24
+    # )
+    # db.add(verification_token)
+    # db.commit()
 
-    # ✅ Send verification email (IONOS SMTP)
-    try:
-        EmailService.send_verification_email(
-            to_email=new_user.email,
-            verification_token=verification_token.token,
-            user_name=new_user.full_name
-        )
-    except Exception as e:
-        # Log error but don't block registration
-        print(f"Warning: Failed to send verification email to {new_user.email}: {e}")
+    # # ✅ Send verification email (IONOS SMTP)
+    # try:
+    #     EmailService.send_verification_email(
+    #         to_email=new_user.email,
+    #         verification_token=verification_token.token,
+    #         user_name=new_user.full_name
+    #     )
+    # except Exception as e:
+    #     # Log error but don't block registration
+    #     print(f"Warning: Failed to send verification email to {new_user.email}: {e}")
 
     return new_user
 
@@ -207,7 +207,7 @@ def complete_invite(token: str, password: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invite token already used")
 
     # Check if expired
-    if invite.expires_at < datetime.utcnow():
+    if invite.expires_at < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Invite token expired")
 
     # Get user
@@ -218,7 +218,7 @@ def complete_invite(token: str, password: str, db: Session = Depends(get_db)):
     # Set password and verify email
     user.hash = get_password_hash(password)
     user.email_verified = True
-    invite.used_at = datetime.utcnow()
+    invite.used_at = datetime.now(timezone.utc)
 
     db.commit()
 

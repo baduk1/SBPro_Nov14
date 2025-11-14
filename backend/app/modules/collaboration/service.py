@@ -3,11 +3,12 @@ Collaboration Module - Business Logic Service
 
 Reusable service layer for collaboration features.
 """
+import asyncio
 import hashlib
 import secrets
 import json
 from typing import List, Optional, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 
@@ -28,6 +29,7 @@ from app.modules.collaboration.config import CollaborationConfig, SKYBUILD_COLLA
 from app.models.user import User
 from app.models.project import Project
 from app.services.email import EmailService
+from app.services.sse import broker
 
 
 class CollaborationService:
@@ -92,7 +94,7 @@ class CollaborationService:
             user_id=user_id,
             role=role,
             invited_by=invited_by_id,
-            accepted_at=datetime.utcnow()  # Direct add = auto-accepted
+            accepted_at=datetime.now(timezone.utc)  # Direct add = auto-accepted
         )
 
         db.add(collaborator)
@@ -184,7 +186,7 @@ class CollaborationService:
             role=role,
             token_hash=token_hash,
             invited_by=invited_by_id,
-            expires_at=datetime.utcnow() + timedelta(days=expires_in_days)
+            expires_at=datetime.now(timezone.utc) + timedelta(days=expires_in_days)
         )
 
         db.add(invitation)
@@ -214,6 +216,21 @@ class CollaborationService:
             import logging
             logging.error(f"Failed to send invitation email to {email}: {e}")
 
+        # Publish SSE event for real-time updates
+        try:
+            asyncio.create_task(broker.publish(
+                f"project:{project_id}:invitations",
+                {
+                    "type": "invitation.created",
+                    "invitation_id": invitation.id,
+                    "email": invitation.email,
+                    "role": invitation.role,
+                    "status": invitation.status
+                }
+            ))
+        except RuntimeError:
+            pass  # No event loop running
+
         return invitation, token
 
     def accept_invitation(
@@ -238,7 +255,7 @@ class CollaborationService:
             raise ValueError("Invalid or expired invitation")
 
         # Check expiration
-        if invitation.expires_at and invitation.expires_at < datetime.utcnow():
+        if invitation.expires_at and invitation.expires_at < datetime.now(timezone.utc):
             invitation.status = 'expired'
             db.commit()
             raise ValueError("Invitation has expired")
@@ -260,7 +277,7 @@ class CollaborationService:
             user_id=user_id,
             role=invitation.role,
             invited_by=invitation.invited_by,
-            accepted_at=datetime.utcnow()
+            accepted_at=datetime.now(timezone.utc)
         )
 
         invitation.status = 'accepted'
@@ -269,7 +286,33 @@ class CollaborationService:
         db.commit()
         db.refresh(collaborator)
 
+        # Publish SSE event for real-time updates
+        try:
+            asyncio.create_task(broker.publish(
+                f"project:{invitation.project_id}:invitations",
+                {
+                    "type": "invitation.accepted",
+                    "invitation_id": invitation.id,
+                    "email": invitation.email,
+                    "status": "accepted"
+                }
+            ))
+        except RuntimeError:
+            pass  # No event loop running
+
         return collaborator
+
+    def get_project_invitations(
+        self,
+        db: Session,
+        project_id: str,
+        status: str = 'pending'
+    ) -> List[ProjectInvitation]:
+        """Get all invitations for a project filtered by status."""
+        return db.query(ProjectInvitation).filter(
+            ProjectInvitation.project_id == project_id,
+            ProjectInvitation.status == status
+        ).all()
 
     def revoke_invitation(
         self,
@@ -285,9 +328,95 @@ class CollaborationService:
         if not invitation:
             return False
 
+        project_id = invitation.project_id
+        invitation_email = invitation.email
+
         invitation.status = 'revoked'
         db.commit()
+
+        # Publish SSE event for real-time updates
+        try:
+            asyncio.create_task(broker.publish(
+                f"project:{project_id}:invitations",
+                {
+                    "type": "invitation.revoked",
+                    "invitation_id": invitation_id,
+                    "email": invitation_email,
+                    "status": "revoked"
+                }
+            ))
+        except RuntimeError:
+            pass  # No event loop running
+
         return True
+
+    def resend_invitation(
+        self,
+        db: Session,
+        invitation_id: int
+    ) -> Tuple[ProjectInvitation, str]:
+        """
+        Resend an invitation email with a new token.
+
+        Returns: (invitation, new_token)
+        """
+        invitation = db.query(ProjectInvitation).filter(
+            ProjectInvitation.id == invitation_id,
+            ProjectInvitation.status == 'pending'
+        ).first()
+
+        if not invitation:
+            raise ValueError("Invitation not found or already processed")
+
+        # Check if expired
+        if invitation.expires_at and invitation.expires_at < datetime.now(timezone.utc):
+            raise ValueError("Invitation has expired - create a new one")
+
+        # Generate new secure token
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+        # Update invitation with new token
+        invitation.token_hash = token_hash
+        db.commit()
+        db.refresh(invitation)
+
+        # Send invitation email
+        project = db.query(Project).filter(Project.id == invitation.project_id).first()
+        inviter = db.query(User).filter(User.id == invitation.invited_by).first()
+
+        project_name = project.name if project else "Unnamed Project"
+        inviter_name = inviter.full_name if (inviter and inviter.full_name) else "A team member"
+
+        # Send email (don't fail if email sending fails)
+        try:
+            EmailService.send_project_invitation_email(
+                to_email=invitation.email,
+                invitation_token=token,
+                project_name=project_name,
+                inviter_name=inviter_name,
+                role=invitation.role,
+                recipient_name=None
+            )
+        except Exception as e:
+            import logging
+            logging.error(f"Failed to resend invitation email to {invitation.email}: {e}")
+
+        # Publish SSE event for real-time updates
+        try:
+            asyncio.create_task(broker.publish(
+                f"project:{invitation.project_id}:invitations",
+                {
+                    "type": "invitation.resent",
+                    "invitation_id": invitation.id,
+                    "email": invitation.email,
+                    "status": invitation.status
+                }
+            ))
+        except RuntimeError:
+            pass  # No event loop running
+
+        return invitation, token
 
     # ==================== Comments ====================
 
@@ -339,7 +468,7 @@ class CollaborationService:
             raise ValueError("Only comment author can edit")
 
         comment.body = data.body
-        comment.updated_at = datetime.utcnow()
+        comment.updated_at = datetime.now(timezone.utc)
 
         db.commit()
         db.refresh(comment)
@@ -463,7 +592,7 @@ class CollaborationService:
             Notification.user_id == user_id,
             Notification.read_at.is_(None)
         ).update(
-            {Notification.read_at: datetime.utcnow()},
+            {Notification.read_at: datetime.now(timezone.utc)},
             synchronize_session=False
         )
 

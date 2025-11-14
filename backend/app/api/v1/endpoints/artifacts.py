@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -12,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/{id}/presign")
-def presign_download(id: str, ttl_seconds: int | None = None, user=Depends(current_user), db: Session = Depends(get_db)):
+def presign_download(id: str, ttl_seconds: Optional[int] = None, user=Depends(current_user), db: Session = Depends(get_db)):
     """Generate presigned download URL - ownership verified via job"""
     # CRITICAL: Verify artifact ownership through job ownership
     a = db.query(Artifact).join(Job, Artifact.job_id == Job.id)\

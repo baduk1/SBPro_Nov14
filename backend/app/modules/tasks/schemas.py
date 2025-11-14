@@ -173,6 +173,27 @@ class TaskBulkAssignUpdate(BaseModel):
     assignee_id: Optional[str]
 
 
+# ==================== Task Reordering (Kanban) ====================
+
+class TaskPositionUpdate(BaseModel):
+    """Update for a single task's position"""
+    id: int
+    position: int
+
+
+class TaskReorderRequest(BaseModel):
+    """Batch reorder tasks within a status column"""
+    status: str = Field(..., description="Status column to reorder within")
+    orders: List[TaskPositionUpdate] = Field(..., min_length=1, max_length=100, description="Task ID and position pairs")
+
+
+class TaskMoveRequest(BaseModel):
+    """Move task to different status and position"""
+    task_id: int
+    new_status: str
+    new_position: int
+
+
 # ==================== Project KPIs ====================
 
 class ProjectKPIs(BaseModel):

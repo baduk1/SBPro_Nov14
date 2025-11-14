@@ -19,7 +19,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { Delete, Email, Schedule } from '@mui/icons-material';
+import { Delete, Email, Schedule, Send } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProjectInvitation } from '../services/api';
 import api from '../services/api';
@@ -51,25 +51,60 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
   } = useQuery({
     queryKey: ['invitations', projectId],
     queryFn: async () => {
-      // Note: Backend endpoint not yet created, will add in next iteration
-      // For now, return empty array
-      return [] as ProjectInvitation[];
+      return api.collaboration.listInvitations(projectId, 'pending');
     },
     enabled: !!projectId,
   });
 
-  // Revoke invitation mutation (placeholder - backend endpoint needed)
+  // Subscribe to real-time invitation updates via SSE
+  React.useEffect(() => {
+    if (!projectId) return;
+
+    // Get auth token for SSE (EventSource can't send Authorization headers)
+    const token = localStorage.getItem('token');
+
+    const eventSource = new EventSource(
+      `${api.API_URL}/projects/${projectId}/invitations/stream${token ? `?access_token=${token}` : ''}`,
+      { withCredentials: true }
+    );
+
+    eventSource.onmessage = (event) => {
+      // Invalidate and refetch invitations when any event arrives
+      queryClient.invalidateQueries({ queryKey: ['invitations', projectId] });
+    };
+
+    eventSource.onerror = () => {
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [projectId, queryClient]);
+
+  // Revoke invitation mutation
   const revokeMutation = useMutation({
     mutationFn: async (invitationId: number) => {
-      // Placeholder - backend endpoint not yet created
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      throw new Error('Revoke endpoint not yet implemented');
+      return api.collaboration.revokeInvitation(invitationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invitations', projectId] });
     },
     onError: (err: any) => {
       onError?.(err.message || 'Failed to revoke invitation');
+    },
+  });
+
+  // Resend invitation mutation
+  const resendMutation = useMutation({
+    mutationFn: async (invitationId: number) => {
+      return api.collaboration.resendInvitation(invitationId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invitations', projectId] });
+    },
+    onError: (err: any) => {
+      onError?.(err.message || 'Failed to resend invitation');
     },
   });
 
@@ -81,22 +116,10 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
     );
   }
 
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ m: 2 }}>
-        Failed to load pending invitations
-      </Alert>
-    );
-  }
-
-  if (!invitations || invitations.length === 0) {
-    return (
-      <Box sx={{ p: 2, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          No pending invitations
-        </Typography>
-      </Box>
-    );
+  // Silently hide component if there's an error (e.g., user doesn't have permission to view invitations)
+  // or if there are no invitations
+  if (error || !invitations || invitations.length === 0) {
+    return null;
   }
 
   return (
@@ -131,20 +154,35 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
               }}
               secondaryAction={
                 status === 'pending' && (
-                  <Tooltip title="Revoke invitation">
-                    <IconButton
-                      edge="end"
-                      onClick={() => {
-                        if (window.confirm('Revoke this invitation?')) {
-                          revokeMutation.mutate(invitation.id);
-                        }
-                      }}
-                      disabled={revokeMutation.isPending}
-                      size="small"
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+                  <Box display="flex" gap={0.5}>
+                    <Tooltip title="Resend invitation">
+                      <IconButton
+                        onClick={() => {
+                          resendMutation.mutate(invitation.id);
+                        }}
+                        disabled={resendMutation.isPending}
+                        sx={{ minWidth: 44, minHeight: 44 }}
+                        aria-label="Resend invitation"
+                      >
+                        <Send fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Revoke invitation">
+                      <IconButton
+                        edge="end"
+                        onClick={() => {
+                          if (window.confirm('Revoke this invitation?')) {
+                            revokeMutation.mutate(invitation.id);
+                          }
+                        }}
+                        disabled={revokeMutation.isPending}
+                        sx={{ minWidth: 44, minHeight: 44 }}
+                        aria-label="Revoke invitation"
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 )
               }
             >

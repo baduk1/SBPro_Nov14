@@ -156,7 +156,7 @@ class WebSocketManager:
                 project = db.query(Project).filter(Project.id == project_id).first()
 
                 has_access = False
-                if project and project.user_id == user_id:
+                if project and project.owner_id == user_id:
                     has_access = True
                 else:
                     # Check collaboration

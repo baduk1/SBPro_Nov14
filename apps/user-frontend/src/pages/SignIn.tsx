@@ -4,8 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { auth } from '../services/api'
 
 export default function SignIn() {
-  // Only use demo email in development mode
-  const [email, setEmail] = useState(import.meta.env.DEV ? 'test' : '')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { login, loading, error } = useAuth()
   
@@ -85,15 +84,24 @@ export default function SignIn() {
   return (
     <Box sx={{maxWidth:380, mx:'auto', mt: 4}}>
       <Typography variant="h5" sx={{mb:1}}>Sign in</Typography>
-      {/* Only show demo alert in development mode */}
-      {import.meta.env.DEV && (
-        <Alert severity="info" sx={{mb:3}}>
-          Demo mode: use email <strong>"test"</strong> (any password)
-        </Alert>
-      )}
       <form onSubmit={handleSubmit}>
-        <TextField fullWidth label="Email" value={email} onChange={(e)=>setEmail(e.target.value)} sx={{mb:2}} />
-        <TextField fullWidth type="password" label="Password" value={password} onChange={(e)=>setPassword(e.target.value)} sx={{mb:2}} />
+        <TextField
+          fullWidth
+          label="Email"
+          variant="outlined"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          sx={{mb:2}}
+        />
+        <TextField
+          fullWidth
+          type="password"
+          label="Password"
+          variant="outlined"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          sx={{mb:2}}
+        />
         <Button variant="contained" fullWidth type="submit" disabled={loading}>Sign in</Button>
       </form>
       

@@ -5,9 +5,12 @@ Pluggable FastAPI router for task management features.
 Can be mounted in any FastAPI application.
 """
 import json
+from datetime import datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, File, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from pathlib import Path
 
 from app.db.session import get_db
 from app.core.security import get_current_user
@@ -20,6 +23,8 @@ from app.modules.tasks.schemas import (
     TaskFilter,
     TaskBulkStatusUpdate,
     TaskBulkAssignUpdate,
+    TaskReorderRequest,
+    TaskMoveRequest,
     TaskRevisionResponse,
     ProjectKPIs
 )
@@ -438,6 +443,115 @@ def create_tasks_router(
 
         return {"updated": count}
 
+    # ==================== Task Reordering (Kanban) ====================
+
+    @router.post("/projects/{project_id}/tasks/reorder", response_model=dict)
+    def reorder_tasks(
+        project_id: str,
+        data: TaskReorderRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Batch reorder tasks within a status column (for Kanban board).
+
+        Requires: editor role or higher
+        """
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            project_id, "editor", db, current_user
+        )
+
+        try:
+            # Convert to list of tuples
+            task_positions = [(order.id, order.position) for order in data.orders]
+
+            count = service.reorder_tasks(
+                db, project_id, data.status, task_positions, current_user.id
+            )
+
+            # Log activity
+            from app.modules.collaboration.service import collaboration_service
+            collaboration_service.log_activity(
+                db, project_id, current_user.id, "tasks.reordered",
+                {"status": data.status, "count": count}
+            )
+
+            return {"updated": count, "status": data.status}
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    @router.post("/projects/{project_id}/tasks/{task_id}/move", response_model=TaskResponse)
+    def move_task(
+        project_id: str,
+        task_id: int,
+        data: TaskMoveRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Move a task to different status and position (drag across Kanban columns).
+
+        Requires: editor role or higher
+        """
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            project_id, "editor", db, current_user
+        )
+
+        try:
+            task = service.move_task(
+                db, task_id, data.new_status, data.new_position, current_user.id
+            )
+
+            # Get user details for response
+            assignee = None
+            if task.assignee_id:
+                assignee_user = db.query(User).filter(User.id == task.assignee_id).first()
+                if assignee_user:
+                    assignee = {
+                        "id": assignee_user.id,
+                        "email": assignee_user.email,
+                        "full_name": assignee_user.full_name
+                    }
+
+            creator = db.query(User).filter(User.id == task.created_by).first()
+
+            # Log activity
+            from app.modules.collaboration.service import collaboration_service
+            collaboration_service.log_activity(
+                db, project_id, current_user.id, "task.moved",
+                {"task_id": task.id, "new_status": data.new_status, "new_position": data.new_position}
+            )
+
+            return {
+                "id": task.id,
+                "project_id": task.project_id,
+                "title": task.title,
+                "description": task.description,
+                "status": task.status,
+                "priority": task.priority,
+                "due_date": task.due_date,
+                "start_date": task.start_date,
+                "type": task.type,
+                "labels": task.labels or [],
+                "linked_resource_type": task.linked_resource_type,
+                "linked_resource_id": task.linked_resource_id,
+                "boq_item_id": task.boq_item_id,
+                "created_at": task.created_at,
+                "updated_at": task.updated_at,
+                "assignee": assignee,
+                "created_by_user": {
+                    "id": creator.id,
+                    "email": creator.email,
+                    "full_name": creator.full_name
+                } if creator else None
+            }
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
     # ==================== Revisions ====================
 
     @router.get("/tasks/{task_id}/revisions", response_model=List[TaskRevisionResponse])
@@ -507,6 +621,288 @@ def create_tasks_router(
         kpis = service.get_project_kpis(db, project_id)
 
         return kpis
+
+    # ==================== Timeline/Gantt View ====================
+
+    @router.get("/projects/{project_id}/tasks/timeline", response_model=List[TaskResponse])
+    def get_timeline_tasks(
+        project_id: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Get tasks for timeline/Gantt view.
+
+        Only returns tasks with start_date or due_date set.
+        Optionally filter by date range.
+
+        Requires: viewer role or higher
+        """
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            project_id, "viewer", db, current_user
+        )
+
+        # Parse date parameters
+        start_date_obj = None
+        end_date_obj = None
+
+        if start_date:
+            try:
+                start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid start_date format. Use YYYY-MM-DD")
+
+        if end_date:
+            try:
+                end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid end_date format. Use YYYY-MM-DD")
+
+        # Get timeline tasks
+        tasks = service.get_timeline_tasks(db, project_id, start_date_obj, end_date_obj)
+
+        # Log activity
+        from app.modules.collaboration.service import collaboration_service
+        collaboration_service.log_activity(
+            db, project_id, current_user.id, "view_timeline",
+            {"task_count": len(tasks)}
+        )
+
+        # Enrich with user details
+        result = []
+        for task in tasks:
+            assignee_user = None
+            if task.assignee_id:
+                assignee_user = db.query(User).filter(User.id == task.assignee_id).first()
+
+            creator_user = db.query(User).filter(User.id == task.created_by).first()
+
+            result.append({
+                "id": task.id,
+                "project_id": task.project_id,
+                "title": task.title,
+                "description": task.description,
+                "status": task.status,
+                "priority": task.priority,
+                "assignee_id": task.assignee_id,
+                "due_date": task.due_date,
+                "start_date": task.start_date,
+                "type": task.type,
+                "labels": task.labels or [],
+                "linked_resource_type": task.linked_resource_type,
+                "linked_resource_id": task.linked_resource_id,
+                "position": task.position,
+                "created_by": task.created_by,
+                "created_at": task.created_at,
+                "updated_at": task.updated_at,
+                "assignee": {
+                    "id": assignee_user.id,
+                    "email": assignee_user.email,
+                    "full_name": assignee_user.full_name
+                } if assignee_user else None,
+                "creator": {
+                    "id": creator_user.id,
+                    "email": creator_user.email,
+                    "full_name": creator_user.full_name
+                } if creator_user else None
+            })
+
+        return result
+
+    # ==================== Task Attachments ====================
+
+    @router.post("/tasks/{task_id}/attachments", status_code=status.HTTP_201_CREATED)
+    async def upload_task_attachment(
+        task_id: int,
+        file: UploadFile = File(...),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Upload an attachment to a task.
+
+        Requires: editor role or higher on the project
+        """
+        # Get task and check project access
+        task = service.get_task(db, task_id)
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            task.project_id, "editor", db, current_user
+        )
+
+        # Validate file size (max 50MB)
+        file.file.seek(0, 2)  # Seek to end
+        file_size = file.file.tell()
+        file.file.seek(0)  # Reset to start
+
+        if file_size > 50 * 1024 * 1024:  # 50MB
+            raise HTTPException(status_code=400, detail="File too large (max 50MB)")
+
+        # Upload attachment
+        try:
+            attachment = service.upload_attachment(
+                db=db,
+                task_id=task_id,
+                filename=file.filename or "unnamed",
+                file=file.file,
+                mime_type=file.content_type,
+                user_id=current_user.id
+            )
+
+            # Log activity
+            from app.modules.collaboration.service import collaboration_service
+            collaboration_service.log_activity(
+                db, task.project_id, current_user.id, "upload_attachment",
+                {"task_id": task_id, "filename": file.filename}
+            )
+
+            # Get uploader user details
+            uploader = db.query(User).filter(User.id == attachment.uploaded_by).first()
+
+            return {
+                "id": attachment.id,
+                "task_id": attachment.task_id,
+                "filename": attachment.filename,
+                "file_size": attachment.file_size,
+                "mime_type": attachment.mime_type,
+                "uploaded_by": attachment.uploaded_by,
+                "uploaded_at": attachment.uploaded_at,
+                "uploader": {
+                    "id": uploader.id,
+                    "email": uploader.email,
+                    "full_name": uploader.full_name
+                } if uploader else None
+            }
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
+
+    @router.get("/tasks/{task_id}/attachments")
+    def list_task_attachments(
+        task_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        List all attachments for a task.
+
+        Requires: viewer role or higher on the project
+        """
+        # Get task and check project access
+        task = service.get_task(db, task_id)
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            task.project_id, "viewer", db, current_user
+        )
+
+        # Get attachments
+        attachments = service.get_attachments(db, task_id)
+
+        # Enrich with uploader details
+        result = []
+        for attachment in attachments:
+            uploader = db.query(User).filter(User.id == attachment.uploaded_by).first()
+            result.append({
+                "id": attachment.id,
+                "task_id": attachment.task_id,
+                "filename": attachment.filename,
+                "file_size": attachment.file_size,
+                "mime_type": attachment.mime_type,
+                "uploaded_by": attachment.uploaded_by,
+                "uploaded_at": attachment.uploaded_at,
+                "uploader": {
+                    "id": uploader.id,
+                    "email": uploader.email,
+                    "full_name": uploader.full_name
+                } if uploader else None
+            })
+
+        return result
+
+    @router.get("/attachments/{attachment_id}/download")
+    def download_attachment(
+        attachment_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Download an attachment.
+
+        Requires: viewer role or higher on the project
+        """
+        # Get attachment
+        attachment = service.get_attachment(db, attachment_id)
+        if not attachment:
+            raise HTTPException(status_code=404, detail="Attachment not found")
+
+        # Get task and check project access
+        task = service.get_task(db, attachment.task_id)
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            task.project_id, "viewer", db, current_user
+        )
+
+        # Check if file exists
+        file_path = Path(attachment.file_path)
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="File not found on server")
+
+        # Return file
+        return FileResponse(
+            path=str(file_path),
+            filename=attachment.filename,
+            media_type=attachment.mime_type or "application/octet-stream"
+        )
+
+    @router.delete("/attachments/{attachment_id}", status_code=status.HTTP_204_NO_CONTENT)
+    def delete_attachment(
+        attachment_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Delete an attachment.
+
+        Requires: editor role or higher on the project
+        """
+        # Get attachment
+        attachment = service.get_attachment(db, attachment_id)
+        if not attachment:
+            raise HTTPException(status_code=404, detail="Attachment not found")
+
+        # Get task and check project access
+        task = service.get_task(db, attachment.task_id)
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # Check permissions
+        project, user_role = permission_checker.require_project_access(
+            task.project_id, "editor", db, current_user
+        )
+
+        # Delete attachment
+        success = service.delete_attachment(db, attachment_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete attachment")
+
+        # Log activity
+        from app.modules.collaboration.service import collaboration_service
+        collaboration_service.log_activity(
+            db, task.project_id, current_user.id, "delete_attachment",
+            {"task_id": task.id, "filename": attachment.filename}
+        )
 
     return router
 

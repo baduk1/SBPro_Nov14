@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
 
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
 from app.api.v1.router import api_router
-from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware, StrictRateLimitMiddleware
 from app.middleware.error_handler import register_error_handlers
 
 # Import reusable modules
@@ -21,6 +24,29 @@ logger = logging.getLogger(__name__)
 # Fail fast: SECRET_KEY must be set for staging/prod (and dev, если хочешь дисциплины)
 if not settings.SECRET_KEY or settings.SECRET_KEY.strip() in ("", "CHANGE_ME_SUPER_SECRET"):
     raise RuntimeError("SECRET_KEY must be set via env. Month-2 production foundation requires secure secrets.")
+
+# Initialize Sentry for error tracking
+if settings.SENTRY_ENABLED and settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.SENTRY_ENVIRONMENT,
+        traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+        integrations=[
+            StarletteIntegration(transaction_style="endpoint"),
+            FastApiIntegration(transaction_style="endpoint"),
+        ],
+        # Send PII data to Sentry (user IDs, IP addresses)
+        send_default_pii=True,
+        # Attach request bodies to error reports
+        max_request_body_size="medium",
+        # Before send hook to filter sensitive data
+        before_send=lambda event, hint: event if settings.ENV != "development" else None,
+    )
+    logger.info(f"Sentry initialized: {settings.SENTRY_ENVIRONMENT}")
+elif settings.ENV == "production":
+    logger.warning("Sentry is disabled in production - set SENTRY_DSN and SENTRY_ENABLED=true")
+else:
+    logger.info("Sentry disabled in development mode")
 
 # Create DB schema (dev only). In production, use migration scripts.
 if settings.ENV != "production":
@@ -55,6 +81,9 @@ app.add_middleware(
 
 # Add rate limiting (100 requests per minute per IP)
 app.add_middleware(RateLimitMiddleware, calls=100, period=60)
+
+# Add strict rate limiting for auth endpoints (10 requests per minute)
+app.add_middleware(StrictRateLimitMiddleware, calls=10, period=60)
 
 # Register error handlers
 register_error_handlers(app)

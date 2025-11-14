@@ -198,6 +198,7 @@ export default function SignUp() {
             <TextField
               label="Full Name"
               type="text"
+              variant="outlined"
               fullWidth
               value={formData.fullName}
               onChange={handleChange('fullName')}
@@ -207,6 +208,7 @@ export default function SignUp() {
             <TextField
               label="Email Address"
               type="email"
+              variant="outlined"
               fullWidth
               required
               value={formData.email}
@@ -218,6 +220,7 @@ export default function SignUp() {
             <TextField
               label="Password"
               type={showPassword ? 'text' : 'password'}
+              variant="outlined"
               fullWidth
               required
               value={formData.password}
@@ -241,6 +244,7 @@ export default function SignUp() {
             <TextField
               label="Confirm Password"
               type={showConfirmPassword ? 'text' : 'password'}
+              variant="outlined"
               fullWidth
               required
               value={formData.confirmPassword}

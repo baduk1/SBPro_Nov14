@@ -19,6 +19,7 @@ from app.schemas.boq import (
 )
 from app.services.pricing import apply_prices
 from app.services.boq import boq_service, BoqConcurrencyError, BoqValidationError
+from app.modules.collaboration.permissions import PermissionChecker
 
 router = APIRouter()
 
@@ -155,7 +156,28 @@ async def update_boq_item(
     If provided and doesn't match, returns 409 Conflict.
 
     Broadcasts update via WebSocket to all connected users in the project.
+
+    **Requires: editor or owner role**
     """
+    # Get BoqItem to find project_id
+    boq_item = db.query(BoqItem).filter(BoqItem.id == item_id).first()
+    if not boq_item:
+        raise HTTPException(status_code=404, detail="BoQ item not found")
+
+    # Get Job to find project_id
+    job = db.query(Job).filter(Job.id == boq_item.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Check permissions: require editor or owner role
+    permissions = PermissionChecker()
+    project, user_role = permissions.require_project_access(
+        job.project_id,
+        "editor",  # minimum role required
+        db,
+        user
+    )
+
     try:
         # Convert to dict and remove None values
         update_data = updates.model_dump(exclude_unset=True)
@@ -207,7 +229,33 @@ async def bulk_update_boq_items(
     Supports optimistic concurrency control via `updated_at` field per item.
 
     Broadcasts bulk update summary via WebSocket to all connected users in the project.
+
+    **Requires: editor or owner role**
     """
+    # Validate at least one item
+    if not request.items:
+        return BoqBulkUpdateResponse(updated=0, skipped=0, errors=[])
+
+    # Get first item to check project permissions
+    first_item_id = request.items[0].id
+    boq_item = db.query(BoqItem).filter(BoqItem.id == first_item_id).first()
+    if not boq_item:
+        raise HTTPException(status_code=404, detail=f"BoQ item {first_item_id} not found")
+
+    # Get Job to find project_id
+    job = db.query(Job).filter(Job.id == boq_item.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Check permissions: require editor or owner role
+    permissions = PermissionChecker()
+    project, user_role = permissions.require_project_access(
+        job.project_id,
+        "editor",  # minimum role required
+        db,
+        user
+    )
+
     # Convert Pydantic models to dicts
     updates = [item.model_dump(exclude_unset=True) for item in request.items]
 

@@ -143,9 +143,14 @@ export default function CollaboratorsPanel({
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ m: 2 }}>
-        Failed to load collaborators
-      </Alert>
+      <Box textAlign="center" py={6}>
+        <Typography variant="body1" color="text.secondary" gutterBottom>
+          Unable to load team members. Please refresh the page or contact support.
+        </Typography>
+        <Button variant="outlined" onClick={() => window.location.reload()} sx={{ mt: 2 }}>
+          Refresh Page
+        </Button>
+      </Box>
     );
   }
 

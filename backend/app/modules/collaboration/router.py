@@ -5,15 +5,20 @@ Pluggable FastAPI router for collaboration features.
 Can be mounted in any FastAPI application.
 """
 import json
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from sse_starlette.sse import EventSourceResponse
 
 from app.db.session import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.project import Project
 
+logger = logging.getLogger(__name__)
+
+from app.modules.collaboration.models import ProjectInvitation
 from app.modules.collaboration.schemas import (
     CollaboratorResponse,
     CollaboratorCreate,
@@ -32,6 +37,7 @@ from app.modules.collaboration.schemas import (
 from app.modules.collaboration.service import CollaborationService
 from app.modules.collaboration.permissions import PermissionChecker
 from app.modules.collaboration.config import CollaborationConfig, SKYBUILD_COLLABORATION_CONFIG
+from app.services.sse import broker
 
 
 def create_collaboration_router(
@@ -71,18 +77,24 @@ def create_collaboration_router(
         result = []
         for collab in collaborators:
             user = db.query(User).filter(User.id == collab.user_id).first()
-            result.append({
+            collab_data = {
                 "id": collab.id,
                 "project_id": collab.project_id,
                 "role": collab.role,
                 "invited_at": collab.invited_at,
                 "accepted_at": collab.accepted_at,
+                # Flat fields for frontend compatibility
+                "user_id": user.id if user else None,
+                "user_email": user.email if user else None,
+                "user_name": user.full_name if user else None,
+                # Nested object (legacy)
                 "user": {
                     "id": user.id,
                     "email": user.email,
                     "full_name": user.full_name
                 } if user else None
-            })
+            }
+            result.append(collab_data)
 
         return result
 
@@ -284,6 +296,152 @@ def create_collaboration_router(
 
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    @router.get("/projects/{project_id}/invitations", response_model=List[InvitationResponse])
+    def list_invitations(
+        project_id: str,
+        invitation_status: str = Query('pending', alias='status'),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        List project invitations filtered by status.
+
+        Requires: editor role or higher
+        """
+        # Check permissions
+        project, user_role = permissions.require_project_access(
+            project_id, "editor", db, current_user
+        )
+
+        invitations = service.get_project_invitations(db, project_id, invitation_status)
+
+        return [{
+            "id": inv.id,
+            "project_id": inv.project_id,
+            "email": inv.email,
+            "role": inv.role,
+            "status": inv.status,
+            "invited_by": inv.invited_by,
+            "invited_at": inv.invited_at,
+            "expires_at": inv.expires_at
+        } for inv in invitations]
+
+    @router.post("/invitations/{invitation_id}/revoke", response_model=dict)
+    def revoke_invitation_endpoint(
+        invitation_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Revoke a pending invitation.
+
+        Requires: owner role
+        """
+        # Get invitation to check project access
+        invitation = db.query(ProjectInvitation).filter(
+            ProjectInvitation.id == invitation_id
+        ).first()
+
+        if not invitation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Invitation not found"
+            )
+
+        # Check permissions
+        project, user_role = permissions.require_project_access(
+            invitation.project_id, "owner", db, current_user
+        )
+
+        success = service.revoke_invitation(db, invitation_id)
+
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Invitation not found or already processed"
+            )
+
+        # Log activity
+        service.log_activity(
+            db, invitation.project_id, current_user.id, "invitation.revoked",
+            {"invitation_id": invitation_id, "email": invitation.email}
+        )
+
+        return {"success": True, "message": "Invitation revoked"}
+
+    @router.post("/invitations/{invitation_id}/resend", response_model=dict)
+    def resend_invitation_endpoint(
+        invitation_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Resend an invitation email with a new token.
+
+        Requires: owner role
+        """
+        # Get invitation to check project access
+        invitation = db.query(ProjectInvitation).filter(
+            ProjectInvitation.id == invitation_id
+        ).first()
+
+        if not invitation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Invitation not found"
+            )
+
+        # Check permissions
+        project, user_role = permissions.require_project_access(
+            invitation.project_id, "owner", db, current_user
+        )
+
+        try:
+            invitation, token = service.resend_invitation(db, invitation_id)
+
+            # Log activity
+            service.log_activity(
+                db, invitation.project_id, current_user.id, "invitation.resent",
+                {"invitation_id": invitation_id, "email": invitation.email}
+            )
+
+            return {
+                "success": True,
+                "message": "Invitation resent",
+                "_token": token  # TEMPORARY: should be sent via email only
+            }
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    @router.get("/projects/{project_id}/invitations/stream")
+    async def stream_project_invitations(
+        project_id: str,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
+        """
+        Server-Sent Events stream for real-time invitation updates.
+
+        Streams invitation events (created, accepted, revoked, resent, expired).
+        Requires: editor role or higher
+        """
+        # Check permissions
+        project, user_role = permissions.require_project_access(
+            project_id, "editor", db, current_user
+        )
+
+        async def event_generator():
+            # Subscribe to project invitation channel
+            async for data in broker.subscribe(f"project:{project_id}:invitations"):
+                yield {"event": "message", "data": json.dumps(data)}
+
+        response = EventSourceResponse(event_generator())
+        # Security headers to prevent token leakage
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        return response
 
     # ==================== Comments ====================
 

@@ -103,7 +103,7 @@ class Comment(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
     # Relationships
-    replies = relationship("Comment", backref="parent", remote_side=[id], cascade="all, delete-orphan")
+    replies = relationship("Comment", backref="parent", remote_side=[id], cascade="all, delete-orphan", single_parent=True)
 
     __table_args__ = (
         Index('idx_comments_project_context', 'project_id', 'context_type', 'context_id'),

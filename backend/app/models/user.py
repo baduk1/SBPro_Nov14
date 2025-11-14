@@ -31,3 +31,4 @@ class User(Base):
     suppliers = relationship("Supplier", back_populates="user")
     templates = relationship("Template", backref="user")
     estimates = relationship("Estimate", backref="user")
+    integrations = relationship("UserIntegration", back_populates="user", cascade="all, delete-orphan")

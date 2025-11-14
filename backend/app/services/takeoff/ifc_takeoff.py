@@ -52,8 +52,8 @@ def _normalize_row(row: Dict) -> Dict:
 
 def run_ifc_takeoff(
     file_path: str,
-    mapping_path: str | None = None,
-    price_path: str | None = None,
+    mapping_path: Optional[str] = None,
+    price_path: Optional[str] = None,
 ) -> List[Dict]:
     engine = _load_engine()
 

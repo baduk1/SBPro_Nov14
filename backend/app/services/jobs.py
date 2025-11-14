@@ -37,11 +37,17 @@ def _refund_credits(db: Session, job: Job) -> None:
         # Log refund failure but don't crash
         _emit(db, job.id, "error", f"Credit refund failed: {e}", progress=None)
 
-# Engines
+# Engines - Legacy PDF engine
 try:
-    from app.services.takeoff.planpdf import run_planpdf_takeoff  # PDF plan engine (rus/eng)
+    from app.services.takeoff.planpdf import run_planpdf_takeoff  # PDF plan engine (rus/eng) - LEGACY
 except Exception:
     run_planpdf_takeoff = None  # type: ignore
+
+# New OpenAI PDF engine
+try:
+    from app.services.takeoff.pdf_takeoff import PDFTakeoffProcessor
+except Exception:
+    PDFTakeoffProcessor = None  # type: ignore
 
 
 def _emit(
@@ -155,8 +161,20 @@ def process_job(job_id: str) -> None:
                 mapping = {"layers": layer_map, "blocks": {}}
                 items = run_dwg_takeoff(upload_path, mapping=mapping, units=None)
 
-            elif ftype == "PDF" and settings.ENABLE_PDF_PLAN_ENGINE and run_planpdf_takeoff:
-                items = run_planpdf_takeoff(upload_path)
+            elif ftype == "PDF":
+                # Use OpenAI Vision API if enabled, otherwise fall back to legacy engine
+                if settings.OPENAI_ENABLED and PDFTakeoffProcessor:
+                    processor = PDFTakeoffProcessor()
+                    items_data = processor.process(db, job_id, upload_path)
+                    # Convert dict format to list format expected by BoqItem creation
+                    items = items_data
+                elif settings.ENABLE_PDF_PLAN_ENGINE and run_planpdf_takeoff:
+                    # Legacy PDF plan engine (OCR-based)
+                    items = run_planpdf_takeoff(upload_path)
+                else:
+                    raise RuntimeError(
+                        "PDF processing not configured. Enable OPENAI_ENABLED=true or ENABLE_PDF_PLAN_ENGINE=true"
+                    )
             else:
                 raise RuntimeError(f"Unsupported file type for take-off: {ftype}")
         except Exception as e:

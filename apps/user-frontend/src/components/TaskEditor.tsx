@@ -67,7 +67,7 @@ export default function TaskEditor({
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
     description: '',
-    status: 'open',
+    status: 'todo',
     priority: 'medium',
     due_date: null,
     assignee_id: '',
@@ -108,7 +108,7 @@ export default function TaskEditor({
       setFormData({
         title: '',
         description: '',
-        status: 'open',
+        status: 'todo',
         priority: 'medium',
         due_date: null,
         assignee_id: '',
@@ -243,9 +243,9 @@ export default function TaskEditor({
                   label="Status"
                   onChange={(e) => handleFieldChange('status', e.target.value)}
                 >
-                  <MenuItem value="open">Open</MenuItem>
+                  <MenuItem value="todo">To Do</MenuItem>
                   <MenuItem value="in_progress">In Progress</MenuItem>
-                  <MenuItem value="completed">Completed</MenuItem>
+                  <MenuItem value="done">Done</MenuItem>
                   <MenuItem value="blocked">Blocked</MenuItem>
                 </Select>
               </FormControl>

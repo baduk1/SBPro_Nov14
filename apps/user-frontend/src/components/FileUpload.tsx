@@ -6,7 +6,11 @@ import { API_URL, uploads, jobs, projects } from '../services/api'
 
 const steps = ['File', 'Details', 'Upload']
 
-export default function FileUpload() {
+interface FileUploadProps {
+  preselectedProjectId?: string
+}
+
+export default function FileUpload({ preselectedProjectId }: FileUploadProps) {
   const [projectId, setProjectId] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [activeStep, setActiveStep] = useState(0)
@@ -16,17 +20,23 @@ export default function FileUpload() {
   const dropRef = useRef<HTMLDivElement | null>(null)
   const navigate = useNavigate()
 
-  // Load user's first project on mount
+  // Load project: use preselected if provided, otherwise load user's first project
   useEffect(() => {
     async function loadProject() {
       try {
-        const userProjects = await projects.list()
-        if (userProjects.length > 0) {
-          setProjectId(userProjects[0].id)
+        if (preselectedProjectId) {
+          // Use preselected project from query param
+          setProjectId(preselectedProjectId)
         } else {
-          // No projects found - create a default one
-          const newProject = await projects.create({ name: 'My First Project' })
-          setProjectId(newProject.id)
+          // Load user's first project
+          const userProjects = await projects.list()
+          if (userProjects.length > 0) {
+            setProjectId(userProjects[0].id)
+          } else {
+            // No projects found - create a default one
+            const newProject = await projects.create({ name: 'My First Project' })
+            setProjectId(newProject.id)
+          }
         }
       } catch (err) {
         console.error('Failed to load project:', err)
@@ -35,10 +45,10 @@ export default function FileUpload() {
       }
     }
     loadProject()
-  }, [])
+  }, [preselectedProjectId])
 
-  // Default acceptance: IFC models for take-off
-  const accept = '.ifc,model/x-ifc,application/octet-stream'
+  // Default acceptance: IFC models and PDF plans for take-off
+  const accept = '.ifc,.pdf,model/x-ifc,application/pdf,application/octet-stream'
 
   // Drag & Drop
   useEffect(() => {
@@ -66,9 +76,17 @@ export default function FileUpload() {
     if (!file) return
     setBusy(true); setUploadPct(0)
     try {
-      // 1) Presign
+      // Determine file type from extension
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      let fileType = 'IFC' // default
+      if (ext === 'pdf') fileType = 'PDF'
+      else if (ext === 'dwg') fileType = 'DWG'
+      else if (ext === 'dxf') fileType = 'DXF'
+      else if (ext === 'ifc') fileType = 'IFC'
+
+      // 1) Presign with correct file type
       const contentType = file.type || 'application/octet-stream'
-      const { file_id, upload_url, headers } = await uploads.presign(projectId, file.name, contentType)
+      const { file_id, upload_url, headers } = await uploads.presign(projectId, file.name, contentType, fileType as 'IFC' | 'DWG' | 'DXF' | 'PDF')
       const absoluteUploadUrl = new URL(upload_url, API_URL).toString()
       // 2) Upload to storage via absolute URL
       await axios.put(absoluteUploadUrl, file, {
@@ -77,9 +95,15 @@ export default function FileUpload() {
           if (p.total) setUploadPct(Math.round((p.loaded / p.total) * 100))
         },
       })
-      // 3) Queue a job
-      const job = await jobs.create(projectId, file_id, 'IFC')
-      navigate(`/app/jobs/${job.id}`)
+      // 3) Queue a job with auto-detected file type
+      const job = await jobs.create(projectId, file_id, fileType)
+
+      // Navigate back to project overview if preselected, otherwise to job status
+      if (preselectedProjectId) {
+        navigate(`/app/projects/${projectId}/overview`)
+      } else {
+        navigate(`/app/jobs/${job.id}`)
+      }
     } catch (e: any) {
       alert(e?.response?.data?.detail || 'Upload failed')
     } finally {
@@ -101,7 +125,12 @@ export default function FileUpload() {
           p:4, textAlign:'center', borderStyle:'dashed',
           '&.drag-over': { borderColor: 'primary.main', backgroundColor: 'rgba(0,229,168,0.06)' }
         }}>
-          <Typography variant="subtitle1" sx={{mb:2}}>Drag an .IFC file here or choose it from your computer</Typography>
+          <Typography variant="subtitle1" sx={{mb:2}}>
+            Drag an <strong>.ifc</strong> or <strong>.pdf</strong> file here or choose it from your computer
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{display:'block', mt:1}}>
+            (.dwg support coming soon)
+          </Typography>
           <Button variant="outlined" component="label">
             Choose file
             <input type="file" hidden accept={accept} onChange={(e)=>setFile(e.target.files?.[0] || null)} />

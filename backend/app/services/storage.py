@@ -1,6 +1,6 @@
 import os, time, hmac, hashlib, base64
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 from app.core.config import settings
 
 UPLOADS_DIR = Path(settings.STORAGE_DIR) / "uploads"
@@ -34,7 +34,7 @@ def _sign(action: str, subject_id: str, exp: int) -> str:
     return _b64url(hmac.new(key, msg, hashlib.sha256).digest())
 
 
-def generate_presigned_url(path: str, action: str, subject_id: str, ttl_seconds: int | None = None) -> str:
+def generate_presigned_url(path: str, action: str, subject_id: str, ttl_seconds: Optional[int] = None) -> str:
     """
     Build presigned URL for upload/download actions.
     path: API-relative path (e.g. f"/api/v1/files/{id}/content")

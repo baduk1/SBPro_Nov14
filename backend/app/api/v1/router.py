@@ -17,10 +17,13 @@ from app.api.v1.endpoints import (
     admin_mapping,
     admin_access_requests,
     access_requests,
+    integrations,
+    search,
 )
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
+api_router.include_router(search.router, tags=["Search"])  # Global search (no prefix)
 api_router.include_router(projects.router, prefix="/projects", tags=["Projects"])
 api_router.include_router(files.router, prefix="/files", tags=["Files"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
@@ -36,3 +39,4 @@ api_router.include_router(admin_price.router, prefix="/admin")
 api_router.include_router(admin_mapping.router, prefix="/admin")
 api_router.include_router(admin_access_requests.router, prefix="/admin")
 api_router.include_router(access_requests.router, prefix="/public", tags=["Public"])
+api_router.include_router(integrations.router, prefix="/integrations", tags=["Integrations"])

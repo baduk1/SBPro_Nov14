@@ -25,7 +25,7 @@ _INSUNITS_TO_M = {
 }
 
 
-def _resolve_units_override(units: str | None) -> float | None:
+def _resolve_units_override(units: Optional[str]) -> float | None:
     if not units:
         return None
     u = units.strip().lower()
@@ -65,7 +65,7 @@ def _open_drawing(path: str):
     raise RuntimeError(f"Unsupported CAD extension: {ext}")
 
 
-def _drawing_scale_to_m(doc, units_override: str | None) -> float:
+def _drawing_scale_to_m(doc, units_override: Optional[str]) -> float:
     ov = _resolve_units_override(units_override)
     if ov is not None:
         return ov
@@ -233,7 +233,7 @@ def _count_blocks(doc, msp, block_map: Dict[str, Dict[str, Any]], max_depth: int
 def run_dwg_takeoff(
     file_path: str,
     mapping: dict | None = None,
-    units: str | None = None,
+    units: Optional[str] = None,
 ) -> List[dict]:
     try:
         doc = _open_drawing(file_path)

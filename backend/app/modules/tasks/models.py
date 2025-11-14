@@ -3,7 +3,7 @@ Tasks/PM Module - Database Models
 
 Reusable task management models for any project management system.
 """
-from sqlalchemy import Column, String, DateTime, ForeignKey, Index, CheckConstraint, Text, BigInteger, Date, ARRAY
+from sqlalchemy import Column, String, DateTime, ForeignKey, Index, CheckConstraint, Text, BigInteger, Date, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -48,8 +48,11 @@ class Task(Base):
     boq_item_id = Column(String, nullable=True)  # Direct link to BoQ item (deprecated, use linked_resource_*)
 
     # Labels (array of strings)
-    # Note: SQLite doesn't support arrays, will store as JSON string in migration
-    labels = Column(ARRAY(String), nullable=True)
+    # Using JSON for cross-database compatibility (SQLite and PostgreSQL)
+    labels = Column(JSON, nullable=True)
+
+    # Position for Kanban board ordering (within status column)
+    position = Column(BigInteger, nullable=False, default=0)
 
     # Audit fields
     created_by = Column(String, ForeignKey("users.id"), nullable=False)
@@ -62,6 +65,7 @@ class Task(Base):
         Index('idx_tasks_status', 'status'),
         Index('idx_tasks_due_date', 'due_date'),
         Index('idx_tasks_created_by', 'created_by'),
+        Index('idx_tasks_project_status_pos', 'project_id', 'status', 'position'),  # For Kanban ordering
     )
 
     def __repr__(self):

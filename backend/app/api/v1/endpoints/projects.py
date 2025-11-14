@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.api.deps import current_user
 from app.db.session import get_db
@@ -10,6 +10,7 @@ from app.models.job import Job
 from app.models.estimate import Estimate
 from app.models.file import File
 from app.models.user import User
+from app.modules.collaboration.models import ProjectCollaborator
 from app.schemas.project import ProjectCreate, ProjectOut, ProjectUpdate
 
 router = APIRouter()
@@ -17,14 +18,45 @@ router = APIRouter()
 
 @router.get("", response_model=List[ProjectOut])
 def list_projects(user: User = Depends(current_user), db: Session = Depends(get_db)):
-    """List all projects owned by the current user"""
-    return db.query(Project).filter(Project.owner_id == user.id).all()
+    """List all projects where user is owner or collaborator"""
+    from app.modules.collaboration.models import ProjectCollaborator
+
+    # Get project IDs where user is a collaborator
+    collab_project_ids = db.query(ProjectCollaborator.project_id).filter(
+        ProjectCollaborator.user_id == user.id
+    ).all()
+    collab_project_ids = [pid[0] for pid in collab_project_ids]
+
+    # Return all projects where user is owner OR collaborator
+    return db.query(Project).filter(
+        (Project.owner_id == user.id) | (Project.id.in_(collab_project_ids))
+    ).all()
 
 
 @router.post("", response_model=ProjectOut)
 def create_project(payload: ProjectCreate, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    p = Project(owner_id=user.id, name=payload.name)
+    # Create project with all fields
+    p = Project(
+        owner_id=user.id,
+        name=payload.name,
+        description=payload.description,
+        start_date=payload.start_date,
+        end_date=payload.end_date,
+        status=payload.status or "active"
+    )
     db.add(p)
+    db.flush()  # Get project ID without committing
+
+    # Automatically add owner as collaborator with 'owner' role
+    collab = ProjectCollaborator(
+        project_id=p.id,
+        user_id=user.id,
+        role='owner',
+        invited_by=user.id,
+        accepted_at=datetime.now(timezone.utc)
+    )
+    db.add(collab)
+
     db.commit()
     db.refresh(p)
     return p
@@ -32,10 +64,22 @@ def create_project(payload: ProjectCreate, user: User = Depends(current_user), d
 
 @router.get("/{id}", response_model=ProjectOut)
 def get_project(id: str, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    """Get a specific project - ownership verified"""
-    p = db.query(Project).filter(Project.id == id, Project.owner_id == user.id).first()
+    """Get a specific project - owner or collaborator can access"""
+    # First check if project exists
+    p = db.query(Project).filter(Project.id == id).first()
     if not p:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    # Check if user is owner OR collaborator
+    is_owner = p.owner_id == user.id
+    is_collaborator = db.query(ProjectCollaborator).filter(
+        ProjectCollaborator.project_id == id,
+        ProjectCollaborator.user_id == user.id
+    ).first() is not None
+
+    if not (is_owner or is_collaborator):
+        raise HTTPException(status_code=404, detail="Project not found")
+
     return p
 
 
@@ -46,10 +90,21 @@ def update_project(
     user: User = Depends(current_user),
     db: Session = Depends(get_db)
 ):
-    """Update project fields - ownership verified"""
-    project = db.query(Project).filter(Project.id == id, Project.owner_id == user.id).first()
+    """Update project fields - owner or editor can modify"""
+    project = db.query(Project).filter(Project.id == id).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    # Check if user is owner OR editor
+    is_owner = project.owner_id == user.id
+    collaborator = db.query(ProjectCollaborator).filter(
+        ProjectCollaborator.project_id == id,
+        ProjectCollaborator.user_id == user.id
+    ).first()
+    is_editor = collaborator and collaborator.role == 'editor'
+
+    if not (is_owner or is_editor):
+        raise HTTPException(status_code=403, detail="Only project owner or editors can update project")
 
     # Update only provided fields
     if payload.name is not None:
@@ -87,10 +142,20 @@ def get_project_history(
     user: User = Depends(current_user),
     db: Session = Depends(get_db)
 ):
-    """Get project history timeline (jobs, estimates, files) - ownership verified"""
-    # Verify project ownership
-    project = db.query(Project).filter(Project.id == id, Project.owner_id == user.id).first()
+    """Get project history timeline (jobs, estimates, files) - owner or collaborator can access"""
+    # Verify project exists
+    project = db.query(Project).filter(Project.id == id).first()
     if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Check if user is owner OR collaborator
+    is_owner = project.owner_id == user.id
+    is_collaborator = db.query(ProjectCollaborator).filter(
+        ProjectCollaborator.project_id == id,
+        ProjectCollaborator.user_id == user.id
+    ).first() is not None
+
+    if not (is_owner or is_collaborator):
         raise HTTPException(status_code=404, detail="Project not found")
     
     events = []
@@ -100,7 +165,7 @@ def get_project_history(
         "id": f"project-{project.id}",
         "type": "created",
         "description": f"Project '{project.name}' created",
-        "timestamp": project.created_at.isoformat() if project.created_at else datetime.utcnow().isoformat(),
+        "timestamp": project.created_at.isoformat() if project.created_at else datetime.now(timezone.utc).isoformat(),
         "user_name": user.full_name or user.email,
         "meta": {"project_name": project.name}
     })
@@ -112,7 +177,7 @@ def get_project_history(
             "id": f"file-{f.id}",
             "type": "file_uploaded",
             "description": f"File '{f.filename}' uploaded",
-            "timestamp": f.uploaded_at.isoformat() if f.uploaded_at else datetime.utcnow().isoformat(),
+            "timestamp": f.uploaded_at.isoformat() if f.uploaded_at else datetime.now(timezone.utc).isoformat(),
             "user_name": user.full_name or user.email,
             "meta": {"filename": f.filename, "file_type": f.type}
         })
@@ -125,7 +190,7 @@ def get_project_history(
             "id": f"job-created-{j.id}",
             "type": "job_created",
             "description": f"Takeoff job started (Status: {j.status})",
-            "timestamp": j.created_at.isoformat() if j.created_at else datetime.utcnow().isoformat(),
+            "timestamp": j.created_at.isoformat() if j.created_at else datetime.now(timezone.utc).isoformat(),
             "user_name": user.full_name or user.email,
             "meta": {"job_id": j.id, "status": j.status}
         })
@@ -151,7 +216,7 @@ def get_project_history(
             "id": f"estimate-{e.id}",
             "type": "estimate_created",
             "description": f"Estimate '{e.name}' created (Total: £{e.total:,.2f})",
-            "timestamp": e.created_at.isoformat() if e.created_at else datetime.utcnow().isoformat(),
+            "timestamp": e.created_at.isoformat() if e.created_at else datetime.now(timezone.utc).isoformat(),
             "user_name": user.full_name or user.email,
             "meta": {"estimate_id": e.id, "estimate_name": e.name, "total": e.total}
         })

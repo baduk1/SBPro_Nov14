@@ -32,6 +32,7 @@ import {
 import {
   Add as AddIcon,
   Edit as EditIcon,
+  Comment as CommentIcon,
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as OpenIcon,
   PlayArrow as InProgressIcon,
@@ -44,6 +45,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { tasks, Task } from '../services/api';
 import { useTaskUpdates } from '../contexts/WebSocketContext';
+import CommentsPanel from './collaboration/CommentsPanel';
 
 interface TaskListProps {
   projectId: string;
@@ -82,6 +84,7 @@ export default function TaskList({ projectId, onTaskClick, onCreateTask }: TaskL
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [commentsTaskId, setCommentsTaskId] = useState<string | null>(null);
 
   // Fetch tasks
   const {
@@ -173,9 +176,14 @@ export default function TaskList({ projectId, onTaskClick, onCreateTask }: TaskL
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ m: 2 }}>
-        Failed to load tasks
-      </Alert>
+      <Box textAlign="center" py={6}>
+        <Typography variant="body1" color="text.secondary" gutterBottom>
+          Unable to load tasks. Please refresh the page or contact support.
+        </Typography>
+        <Button variant="outlined" onClick={() => window.location.reload()} sx={{ mt: 2 }}>
+          Refresh Page
+        </Button>
+      </Box>
     );
   }
 
@@ -329,20 +337,45 @@ export default function TaskList({ projectId, onTaskClick, onCreateTask }: TaskL
                   </Box>
 
                   {/* Actions */}
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTaskClick(task.id);
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                  <Stack direction="row" spacing={0.5}>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCommentsTaskId(task.id.toString());
+                      }}
+                      aria-label="View comments"
+                      sx={{ minWidth: 44, minHeight: 44 }}
+                    >
+                      <CommentIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTaskClick(task.id);
+                      }}
+                      aria-label="Edit task"
+                      sx={{ minWidth: 44, minHeight: 44 }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
                 </Stack>
               </CardContent>
             </Card>
           ))}
         </Stack>
+      )}
+
+      {/* Comments Panel */}
+      {commentsTaskId && (
+        <CommentsPanel
+          projectId={projectId}
+          contextType="task"
+          contextId={commentsTaskId}
+          open={!!commentsTaskId}
+          onClose={() => setCommentsTaskId(null)}
+          title="Task Comments"
+        />
       )}
     </Box>
   );

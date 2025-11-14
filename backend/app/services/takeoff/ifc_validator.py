@@ -36,7 +36,7 @@ def _get_schema(m) -> str:
     return schema
 
 
-def _si_prefix_scale(prefix: str | None) -> float:
+def _si_prefix_scale(prefix: Optional[str]) -> float:
     mapping = {
         None: 1.0,
         "MILLI": 1e-3,

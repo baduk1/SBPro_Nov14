@@ -183,7 +183,7 @@ class BoqService:
 
         # Update timestamp only if something changed
         if was_modified:
-            item.updated_at = datetime.utcnow()
+            item.updated_at = datetime.now(timezone.utc)
 
         db.commit()
         db.refresh(item)

@@ -119,7 +119,7 @@ export const uploads = {
 }
 
 export const jobs = {
-  create: async (projectId: string, fileId: string, fileType: 'IFC') => {
+  create: async (projectId: string, fileId: string, fileType: 'IFC' | 'PDF' | 'DWG' | 'DXF') => {
     const res = await api.post<Job>('/jobs', {
       project_id: projectId,
       file_id: fileId,
@@ -474,11 +474,21 @@ export const projects = {
     const res = await api.get<Project>(`/projects/${id}`)
     return res.data
   },
-  create: async (data: { name: string }) => {
+  create: async (data: {
+    name: string
+    description?: string
+    start_date?: string
+    end_date?: string
+  }) => {
     const res = await api.post<Project>('/projects', data)
     return res.data
   },
-  update: async (id: string, data: { name: string }) => {
+  update: async (id: string, data: {
+    name?: string
+    description?: string
+    start_date?: string
+    end_date?: string
+  }) => {
     const res = await api.patch<Project>(`/projects/${id}`, data)
     return res.data
   },
@@ -549,6 +559,20 @@ export const collaboration = {
     const res = await api.post<ProjectInvitation>(`/projects/${projectId}/invite`, data)
     return res.data
   },
+  listInvitations: async (projectId: string, status: string = 'pending') => {
+    const res = await api.get<ProjectInvitation[]>(`/projects/${projectId}/invitations`, {
+      params: { status }
+    })
+    return res.data
+  },
+  revokeInvitation: async (invitationId: number) => {
+    const res = await api.post(`/invitations/${invitationId}/revoke`)
+    return res.data
+  },
+  resendInvitation: async (invitationId: number) => {
+    const res = await api.post(`/invitations/${invitationId}/resend`)
+    return res.data
+  },
   acceptInvitation: async (token: string) => {
     const res = await api.post<Collaborator>('/join-project', { token })
     return res.data
@@ -593,8 +617,9 @@ export interface ProjectKPIs {
 
 export const tasks = {
   list: async (projectId: string, filter?: TaskFilter) => {
-    const res = await api.get<Task[]>(`/projects/${projectId}/tasks`, { params: filter })
-    return res.data
+    const res = await api.get<{ tasks: Task[]; total: number; page: number; limit: number; pages: number }>(`/projects/${projectId}/tasks`, { params: filter })
+    // Backend returns paginated response - extract tasks array
+    return res.data.tasks
   },
   get: async (taskId: number) => {
     const res = await api.get<Task>(`/tasks/${taskId}`)

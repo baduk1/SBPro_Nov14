@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -76,7 +76,7 @@ def approve_access_request(request_id: str, db: Session = Depends(get_db)):
             EmailVerificationToken.used_at == None
         ).all()
         for token in old_tokens:
-            token.used_at = datetime.utcnow()
+            token.used_at = datetime.now(timezone.utc)
     else:
         # Create new user WITHOUT password (will be set via invite)
         user = User(
@@ -91,12 +91,12 @@ def approve_access_request(request_id: str, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
         
-        # Create default project
-        default_project = Project(
-            owner_id=user.id,
-            name='My First Project'
-        )
-        db.add(default_project)
+        # Create default project (DISABLED - users should create projects manually or be invited)
+        # default_project = Project(
+        #     owner_id=user.id,
+        #     name='My First Project'
+        # )
+        # db.add(default_project)
     
     # Create invite token (expires in 7 days for invites)
     invite_token = EmailVerificationToken.create_token_with_expiry(

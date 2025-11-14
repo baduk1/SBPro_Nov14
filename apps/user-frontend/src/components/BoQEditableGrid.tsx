@@ -27,12 +27,16 @@ import {
   CircularProgress,
   Alert,
   Typography,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { Save, Edit, Cancel, Warning } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { jobs } from '../services/api';
 import { useBoqUpdates, useBoqBulkUpdates } from '../contexts/WebSocketContext';
 import api from '../services/api';
+import BoQCardList from './BoQCardList';
+import { formatNumber } from '../utils/currency';
 
 interface BoQItem {
   id: string;
@@ -66,6 +70,8 @@ export default function BoQEditableGrid({
   onError,
 }: BoQEditableGridProps) {
   const queryClient = useQueryClient();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [conflictItems, setConflictItems] = useState<Set<string>>(new Set());
 
@@ -277,8 +283,8 @@ export default function BoQEditableGrid({
         <Typography variant="body2">
           {field === 'qty' || field === 'unit_price' || field === 'total_price'
             ? typeof value === 'number'
-              ? value.toFixed(2)
-              : '0.00'
+              ? formatNumber(value)
+              : formatNumber(0)
             : value || '-'}
         </Typography>
       </Box>
@@ -309,6 +315,23 @@ export default function BoQEditableGrid({
     );
   }
 
+  // Mobile: Show card list
+  if (isMobile) {
+    return (
+      <BoQCardList
+        items={boqItems}
+        editable={editable}
+        conflictItems={conflictItems}
+        onEdit={(item) => {
+          // TODO: Open edit dialog/sheet for mobile
+          console.log('Edit item:', item);
+          onError?.('Mobile editing coming soon!');
+        }}
+      />
+    );
+  }
+
+  // Desktop/Tablet: Show table
   return (
     <Paper>
       <TableContainer sx={{ maxHeight: 600 }}>
@@ -364,7 +387,7 @@ export default function BoQEditableGrid({
                 </TableCell>
                 <TableCell align="right" sx={{ minWidth: 120 }}>
                   <Typography variant="body2" fontWeight="bold">
-                    {item.total_price.toFixed(2)}
+                    {formatNumber(item.total_price)}
                   </Typography>
                 </TableCell>
               </TableRow>

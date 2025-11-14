@@ -1,16 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Typography, Paper, Stack, Button, Alert,
   FormControl, InputLabel, Select, MenuItem, Chip, Divider
 } from '@mui/material'
-import { Store as StoreIcon } from '@mui/icons-material'
+import {
+  Store as StoreIcon,
+  Group as GroupIcon,
+  Assignment as TaskIcon,
+  ViewKanban as KanbanIcon,
+  Timeline as TimelineIcon,
+  History as HistoryIcon
+} from '@mui/icons-material'
 import DataTable from '../components/DataTable'
+import { ResponsiveColumn } from '../components/ResponsiveDataGrid'
 import AIMappingSuggestions from '../components/AIMappingSuggestions'
-import { jobs, artifacts as artifactsApi, suppliers, TakeoffItem, Artifact, Supplier, API_URL } from '../services/api'
+import { jobs, artifacts as artifactsApi, suppliers, TakeoffItem, Artifact, Supplier, API_URL, Job } from '../services/api'
 
 export default function TakeoffPreview() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const [job, setJob] = useState<Job | null>(null)
   const [rows, setRows] = useState<TakeoffItem[]>([])
   const [artifacts, setArtifacts] = useState<Artifact[]>([])
   const [suppliersList, setSuppliersList] = useState<Supplier[]>([])
@@ -19,6 +29,20 @@ export default function TakeoffPreview() {
   const [exportingFormat, setExportingFormat] = useState<'csv' | 'xlsx' | 'pdf' | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Load job details to get project_id
+  useEffect(() => {
+    let alive = true
+    const loadJob = async () => {
+      if (!id) return
+      try {
+        const data = await jobs.get(id)
+        if (alive) setJob(data)
+      } catch {/* ignore */}
+    }
+    loadJob()
+    return () => { alive = false }
+  }, [id])
 
   useEffect(()=>{
     let alive = true
@@ -143,12 +167,37 @@ export default function TakeoffPreview() {
     return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`
   }
 
-  const columns = [
-    { field: 'element_type', headerName: 'Type', width: 140 },
-    { field: 'description', headerName: 'Description', flex: 1 },
-    { field: 'unit', headerName: 'Unit', width: 100 },
-    { field: 'qty', headerName: 'Qty', width: 140 },
-    { field: 'source_ref', headerName: 'Source', width: 160 },
+  const columns: ResponsiveColumn[] = [
+    {
+      field: 'element_type',
+      headerName: 'Type',
+      width: 140,
+      priority: 'high' // Always visible - essential for understanding quantities
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      flex: 1,
+      priority: 'high' // Always visible - essential field
+    },
+    {
+      field: 'unit',
+      headerName: 'Unit',
+      width: 100,
+      priority: 'medium' // Hidden on mobile (<600px)
+    },
+    {
+      field: 'qty',
+      headerName: 'Qty',
+      width: 140,
+      priority: 'high' // Always visible - key data
+    },
+    {
+      field: 'source_ref',
+      headerName: 'Source',
+      width: 160,
+      priority: 'low' // Hidden on mobile and tablet portrait
+    },
   ]
 
   const summary = useMemo(()=>{
@@ -183,6 +232,55 @@ export default function TakeoffPreview() {
   return (
     <Box>
       <Typography variant="h5" sx={{mb:2}}>Take‑off</Typography>
+
+      {/* Project Space Navigation */}
+      {job?.project_id && (
+        <Paper sx={{ p: 2, mb: 2, bgcolor: 'primary.50' }}>
+          <Typography variant="h6" sx={{ mb: 1.5 }}>
+            Project Space
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Access collaboration and project management features
+          </Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap">
+            <Button
+              variant="outlined"
+              startIcon={<GroupIcon />}
+              onClick={() => navigate(`/app/projects/${job.project_id}/team`)}
+            >
+              Team
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<TaskIcon />}
+              onClick={() => navigate(`/app/projects/${job.project_id}/tasks`)}
+            >
+              Tasks
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<KanbanIcon />}
+              onClick={() => navigate(`/app/projects/${job.project_id}/kanban`)}
+            >
+              Kanban Board
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<TimelineIcon />}
+              onClick={() => navigate(`/app/projects/${job.project_id}/timeline`)}
+            >
+              Timeline
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<HistoryIcon />}
+              onClick={() => navigate(`/app/projects/${job.project_id}/history`)}
+            >
+              History
+            </Button>
+          </Stack>
+        </Paper>
+      )}
 
       {/* Mapping Suggestions */}
       <AIMappingSuggestions
@@ -273,7 +371,7 @@ export default function TakeoffPreview() {
         ))}
       </Box>
 
-      <DataTable rows={rows} columns={columns as any} />
+      <DataTable rows={rows} columns={columns} />
 
       {artifacts.length > 0 && (
         <Box sx={{ mt: 4 }}>

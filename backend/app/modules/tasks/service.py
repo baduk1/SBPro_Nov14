@@ -4,14 +4,18 @@ Tasks/PM Module - Business Logic Service
 Reusable service layer for task management features.
 """
 import json
-from typing import List, Optional, Tuple, Dict
-from datetime import datetime, date, timedelta
+import os
+import shutil
+from pathlib import Path
+from typing import List, Optional, Tuple, Dict, BinaryIO
+from datetime import datetime, date, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_, func, case
 
-from app.modules.tasks.models import Task, TaskRevision
+from app.modules.tasks.models import Task, TaskRevision, TaskAttachment
 from app.modules.tasks.schemas import TaskCreate, TaskUpdate, TaskFilter
 from app.modules.tasks.config import TasksModuleConfig, SKYBUILD_TASKS_CONFIG
+from app.core.config import settings
 
 
 class TasksService:
@@ -60,6 +64,9 @@ class TasksService:
             if count >= self.config.max_tasks_per_project:
                 raise ValueError(f"Maximum tasks limit reached ({self.config.max_tasks_per_project})")
 
+        # Get next position for the status column
+        next_position = self.get_next_position(db, project_id, data.status)
+
         # Create task
         task = Task(
             project_id=project_id,
@@ -75,6 +82,7 @@ class TasksService:
             linked_resource_type=data.linked_resource_type,
             linked_resource_id=data.linked_resource_id,
             boq_item_id=data.boq_item_id,  # Legacy support
+            position=next_position,  # Auto-assign position for Kanban
             created_by=creator_id
         )
 
@@ -214,7 +222,7 @@ class TasksService:
                 setattr(task, field, new_value)
 
         # Update timestamp
-        task.updated_at = datetime.utcnow()
+        task.updated_at = datetime.now(timezone.utc)
 
         # Record revision if there were changes
         if changes:
@@ -284,7 +292,7 @@ class TasksService:
                 db.add(revision)
 
                 task.status = status
-                task.updated_at = datetime.utcnow()
+                task.updated_at = datetime.now(timezone.utc)
                 count += 1
 
         db.commit()
@@ -322,7 +330,7 @@ class TasksService:
                 db.add(revision)
 
                 task.assignee_id = assignee_id
-                task.updated_at = datetime.utcnow()
+                task.updated_at = datetime.now(timezone.utc)
                 count += 1
 
         db.commit()
@@ -417,6 +425,290 @@ class TasksService:
             "tasks_due_next_week": tasks_due_next_week,
             "completion_percentage": round(completion_percentage, 2)
         }
+
+    # ==================== Task Reordering (Kanban) ====================
+
+    def reorder_tasks(
+        self,
+        db: Session,
+        project_id: str,
+        status: str,
+        task_positions: List[Tuple[int, int]],  # [(task_id, position), ...]
+        actor_id: str
+    ) -> int:
+        """
+        Batch reorder tasks within a status column.
+
+        Args:
+            project_id: Project ID
+            status: Status column being reordered
+            task_positions: List of (task_id, new_position) tuples
+            actor_id: User performing the reorder
+
+        Returns:
+            Number of tasks updated
+
+        Raises:
+            ValueError: If any task doesn't belong to the project or status
+        """
+        # Verify all tasks exist and belong to the project and status
+        task_ids = [task_id for task_id, _ in task_positions]
+        tasks = db.query(Task).filter(
+            Task.id.in_(task_ids),
+            Task.project_id == project_id,
+            Task.status == status
+        ).all()
+
+        if len(tasks) != len(task_ids):
+            raise ValueError("One or more tasks not found or don't belong to this project/status")
+
+        # Update positions
+        updated_count = 0
+        for task_id, new_position in task_positions:
+            task = next((t for t in tasks if t.id == task_id), None)
+            if task and task.position != new_position:
+                task.position = new_position
+                updated_count += 1
+
+        db.commit()
+        return updated_count
+
+    def move_task(
+        self,
+        db: Session,
+        task_id: int,
+        new_status: str,
+        new_position: int,
+        actor_id: str
+    ) -> Task:
+        """
+        Move a task to a different status column and position.
+
+        Args:
+            task_id: Task ID to move
+            new_status: New status
+            new_position: New position within the status
+            actor_id: User performing the move
+
+        Returns:
+            Updated task
+
+        Raises:
+            ValueError: If task not found or invalid status
+        """
+        task = db.query(Task).filter(Task.id == task_id).first()
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        # Validate status
+        if new_status not in self.config.available_statuses:
+            raise ValueError(f"Invalid status: {new_status}")
+
+        # Track changes for revision
+        changes = {}
+        if task.status != new_status:
+            changes["status"] = {"old": task.status, "new": new_status}
+            task.status = new_status
+
+        if task.position != new_position:
+            changes["position"] = {"old": task.position, "new": new_position}
+            task.position = new_position
+
+        # Create revision if there were changes
+        if changes:
+            revision = TaskRevision(
+                task_id=task.id,
+                project_id=task.project_id,
+                changed_by=actor_id,
+                changes=json.dumps(changes)
+            )
+            db.add(revision)
+
+        db.commit()
+        db.refresh(task)
+
+        return task
+
+    def get_next_position(
+        self,
+        db: Session,
+        project_id: str,
+        status: str
+    ) -> int:
+        """
+        Get the next available position for a task in a status column.
+
+        Useful when creating new tasks.
+        """
+        max_position = db.query(func.max(Task.position)).filter(
+            Task.project_id == project_id,
+            Task.status == status
+        ).scalar()
+
+        return (max_position or 0) + 1
+
+    # ==================== Timeline/Gantt View ====================
+
+    def get_timeline_tasks(
+        self,
+        db: Session,
+        project_id: str,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
+    ) -> List[Task]:
+        """
+        Get tasks suitable for timeline/Gantt view.
+
+        Filters tasks that have either start_date or due_date set,
+        optionally within a date range.
+        """
+        query = db.query(Task).filter(
+            Task.project_id == project_id,
+            or_(Task.start_date.isnot(None), Task.due_date.isnot(None))
+        )
+
+        # Apply date range filters if provided
+        if start_date:
+            # Include tasks that end after the range start
+            query = query.filter(
+                or_(
+                    Task.due_date >= start_date,
+                    and_(Task.due_date.is_(None), Task.start_date >= start_date)
+                )
+            )
+
+        if end_date:
+            # Include tasks that start before the range end
+            query = query.filter(
+                or_(
+                    Task.start_date <= end_date,
+                    and_(Task.start_date.is_(None), Task.due_date <= end_date)
+                )
+            )
+
+        # Sort by start date, then due date
+        query = query.order_by(
+            case(
+                (Task.start_date.isnot(None), Task.start_date),
+                else_=Task.due_date
+            ).asc()
+        )
+
+        return query.all()
+
+    # ==================== Task Attachments ====================
+
+    def upload_attachment(
+        self,
+        db: Session,
+        task_id: int,
+        filename: str,
+        file: BinaryIO,
+        mime_type: Optional[str],
+        user_id: str
+    ) -> TaskAttachment:
+        """
+        Upload a file attachment for a task.
+
+        Args:
+            task_id: Task ID
+            filename: Original filename
+            file: File object to upload
+            mime_type: MIME type of the file
+            user_id: User uploading the file
+
+        Returns:
+            TaskAttachment instance
+        """
+        # Verify task exists
+        task = db.query(Task).filter(Task.id == task_id).first()
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        # Create attachments directory
+        attachments_dir = Path(settings.STORAGE_DIR) / "attachments" / str(task_id)
+        attachments_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate unique filename
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        file_extension = Path(filename).suffix
+        safe_filename = f"{timestamp}_{filename}"
+        file_path = attachments_dir / safe_filename
+
+        # Save file
+        with open(file_path, "wb") as f:
+            shutil.copyfileobj(file, f)
+
+        # Get file size
+        file_size = file_path.stat().st_size
+
+        # Create attachment record
+        attachment = TaskAttachment(
+            task_id=task_id,
+            filename=filename,
+            file_path=str(file_path),
+            file_size=file_size,
+            mime_type=mime_type,
+            uploaded_by=user_id
+        )
+
+        db.add(attachment)
+        db.commit()
+        db.refresh(attachment)
+
+        return attachment
+
+    def get_attachments(
+        self,
+        db: Session,
+        task_id: int
+    ) -> List[TaskAttachment]:
+        """Get all attachments for a task."""
+        return db.query(TaskAttachment).filter(
+            TaskAttachment.task_id == task_id
+        ).order_by(TaskAttachment.uploaded_at.desc()).all()
+
+    def get_attachment(
+        self,
+        db: Session,
+        attachment_id: int
+    ) -> Optional[TaskAttachment]:
+        """Get a single attachment by ID."""
+        return db.query(TaskAttachment).filter(
+            TaskAttachment.id == attachment_id
+        ).first()
+
+    def delete_attachment(
+        self,
+        db: Session,
+        attachment_id: int
+    ) -> bool:
+        """
+        Delete an attachment.
+
+        Removes both the database record and the physical file.
+        """
+        attachment = db.query(TaskAttachment).filter(
+            TaskAttachment.id == attachment_id
+        ).first()
+
+        if not attachment:
+            return False
+
+        # Delete physical file
+        try:
+            file_path = Path(attachment.file_path)
+            if file_path.exists():
+                file_path.unlink()
+        except Exception as e:
+            # Log error but continue with database deletion
+            print(f"Error deleting file: {e}")
+
+        # Delete database record
+        db.delete(attachment)
+        db.commit()
+
+        return True
 
 
 # Global service instance

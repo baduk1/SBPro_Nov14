@@ -6,14 +6,17 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 import LandingNew from './pages/LandingNew'
 import Shell from './App'
-import Dashboard from './pages/Dashboard'
+import Dashboard from './pages/DashboardNew'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import VerifyEmail from './pages/VerifyEmail'
 import Onboarding from './pages/Onboarding'
+import NotionCallback from './pages/NotionCallback'
 import Upload from './pages/Upload'
 import JobStatus from './pages/JobStatus'
 import TakeoffPreview from './pages/TakeoffPreview'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 // New pages
 import SuppliersList from './pages/Suppliers/SuppliersList'
@@ -26,7 +29,15 @@ import EstimateDetailsNew from './pages/Estimates/EstimateDetailsNew'
 import ProjectHistory from './pages/Projects/ProjectHistory'
 import ProjectCollaboration from './pages/Projects/ProjectCollaboration'
 import ProjectTasks from './pages/Projects/ProjectTasks'
+import ProjectKanban from './pages/Projects/ProjectKanban'
+import ProjectTimeline from './pages/Projects/ProjectTimeline'
+import ProjectOverview from './pages/Projects/ProjectOverview'
+import ProjectBoQ from './pages/Projects/ProjectBoQ'
 import BoQEditor from './pages/Jobs/BoQEditor'
+
+// Layouts and Components
+import ProjectLayout from './layouts/ProjectLayout'
+import LegacyJobRedirect from './components/LegacyJobRedirect'
 
 import { ColorModeProvider } from './hooks/useColorMode'
 import { WebSocketProvider } from './contexts/WebSocketContext'
@@ -71,6 +82,8 @@ const router = createBrowserRouter([
       { path: '/', element: <LandingNew /> },
       { path: '/verify-email', element: <VerifyEmail /> },
       { path: '/onboarding', element: <Onboarding /> },
+      { path: '/privacy', element: <Privacy /> },
+      { path: '/terms', element: <Terms /> },
     ],
   },
   {
@@ -87,8 +100,13 @@ const router = createBrowserRouter([
           { path: 'signup', element: <SignUp /> },
           { path: 'upload', element: <Upload /> },
           { path: 'jobs/:id', element: <JobStatus /> },
-          { path: 'jobs/:id/takeoff', element: <TakeoffPreview /> },
-          { path: 'jobs/:id/boq', element: <BoQEditor /> },
+
+          // Integrations
+          { path: 'integrations/notion/callback', element: <NotionCallback /> },
+
+          // Legacy redirects - redirect old job URLs to new project URLs
+          { path: 'jobs/:id/takeoff', element: <LegacyJobRedirect /> },
+          { path: 'jobs/:id/boq', element: <LegacyJobRedirect /> },
 
           // Suppliers
           { path: 'suppliers', element: <SuppliersList /> },
@@ -103,10 +121,25 @@ const router = createBrowserRouter([
           { path: 'estimates', element: <EstimatesListNew /> },
           { path: 'estimates/:id', element: <EstimateDetailsNew /> },
 
-          // Projects
-          { path: 'projects/:id/history', element: <ProjectHistory /> },
-          { path: 'projects/:id/team', element: <ProjectCollaboration /> },
-          { path: 'projects/:id/tasks', element: <ProjectTasks /> },
+          // Projects - wrapped in ProjectLayout
+          {
+            path: 'projects/:id',
+            element: <ProjectLayout />,
+            children: [
+              { path: 'overview', element: <ProjectOverview /> },
+              { path: 'upload', element: <Upload /> },
+              { path: 'boq', element: <ProjectBoQ /> },
+              { path: 'estimates', element: <EstimatesListNew /> },
+              { path: 'estimates/:estimateId', element: <EstimateDetailsNew /> },
+              { path: 'team', element: <ProjectCollaboration /> },
+              { path: 'tasks', element: <ProjectTasks /> },
+              { path: 'kanban', element: <ProjectKanban /> },
+              { path: 'timeline', element: <ProjectTimeline /> },
+              { path: 'history', element: <ProjectHistory /> },
+              { path: 'files', element: <div>Files placeholder</div> },
+              { path: 'settings', element: <div>Settings placeholder</div> },
+            ],
+          },
         ],
       },
     ],

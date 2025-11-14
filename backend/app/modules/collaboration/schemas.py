@@ -41,7 +41,12 @@ class CollaboratorResponse(BaseModel):
     role: str
     invited_at: datetime
     accepted_at: Optional[datetime] = None
-    user: dict  # Will contain: id, email, full_name
+    # Flat fields for frontend compatibility
+    user_id: Optional[str] = None
+    user_email: Optional[str] = None
+    user_name: Optional[str] = None
+    # Nested object (legacy)
+    user: Optional[dict] = None  # Will contain: id, email, full_name
 
     class Config:
         from_attributes = True

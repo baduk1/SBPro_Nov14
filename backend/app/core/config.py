@@ -73,6 +73,23 @@ class Settings(BaseSettings):
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     REDIS_ENABLED: bool = os.getenv("REDIS_ENABLED", "false").lower() == "true"
 
+    # Sentry Configuration (for error tracking)
+    SENTRY_DSN: Optional[str] = os.getenv("SENTRY_DSN")
+    SENTRY_ENABLED: bool = os.getenv("SENTRY_ENABLED", "false").lower() == "true"
+    SENTRY_ENVIRONMENT: str = os.getenv("SENTRY_ENVIRONMENT", "development")
+    SENTRY_TRACES_SAMPLE_RATE: float = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.1"))
+
+    # OpenAI Configuration (for PDF Vision API processing)
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")  # gpt-4o-mini is cheaper, gpt-4o for better quality
+    OPENAI_ENABLED: bool = os.getenv("OPENAI_ENABLED", "false").lower() == "true"
+
+    # Notion OAuth Configuration (for BoQ export integration)
+    NOTION_CLIENT_ID: Optional[str] = os.getenv("NOTION_CLIENT_ID")
+    NOTION_CLIENT_SECRET: Optional[str] = os.getenv("NOTION_CLIENT_SECRET")
+    NOTION_REDIRECT_URI: str = os.getenv("NOTION_REDIRECT_URI", "http://localhost:5173/integrations/notion/callback")
+    NOTION_AUTHORIZATION_URL: str = "https://api.notion.com/v1/oauth/authorize"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
