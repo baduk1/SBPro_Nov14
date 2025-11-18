@@ -381,11 +381,11 @@ class EmailService:
         </html>
         """
 
-        role_permissions = {{
+        role_permissions = {
             "owner": "manage everything including team members",
             "editor": "view and edit all project data, manage tasks",
             "viewer": "view project data and reports"
-        }}.get(role, "collaborate on the project")
+        }.get(role, "collaborate on the project")
 
         text_content = f"""
         {greeting}

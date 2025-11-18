@@ -48,6 +48,8 @@ interface BoQItem {
   unit_price: number;
   total_price: number;
   updated_at?: string;
+  filename?: string;
+  file_id?: string;
 }
 
 interface BoQEditableGridProps {
@@ -347,6 +349,9 @@ export default function BoQEditableGrid({
               <TableCell sx={{ fontWeight: 'bold', bgcolor: 'primary.main', color: 'white' }}>
                 Unit
               </TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: 'primary.main', color: 'white' }}>
+                Source File
+              </TableCell>
               <TableCell
                 align="right"
                 sx={{ fontWeight: 'bold', bgcolor: 'primary.main', color: 'white' }}
@@ -379,6 +384,11 @@ export default function BoQEditableGrid({
                 <TableCell sx={{ minWidth: 100 }}>{renderCell(item, 'code')}</TableCell>
                 <TableCell sx={{ minWidth: 250 }}>{renderCell(item, 'description')}</TableCell>
                 <TableCell sx={{ minWidth: 80 }}>{renderCell(item, 'unit')}</TableCell>
+                <TableCell sx={{ minWidth: 150 }}>
+                  <Typography variant="body2" color="text.secondary" noWrap title={item.filename || 'N/A'}>
+                    {item.filename || 'N/A'}
+                  </Typography>
+                </TableCell>
                 <TableCell align="right" sx={{ minWidth: 120 }}>
                   {renderCell(item, 'qty')}
                 </TableCell>

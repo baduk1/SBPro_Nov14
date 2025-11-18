@@ -173,7 +173,7 @@ export default function ProjectBoQ() {
             variant="contained"
             onClick={() => navigate(`/app/upload?project=${projectId}`)}
           >
-            Upload IFC File
+            Upload File
           </Button>
         </Alert>
       </Box>

@@ -18,6 +18,9 @@ class BoqItemOut(BaseModel):
     total_price: float = 0.0
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    # Source file information
+    file_id: Optional[str] = None
+    filename: Optional[str] = None
 
 
 class MappingPatchItem(BaseModel):

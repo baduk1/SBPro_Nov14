@@ -10,6 +10,8 @@ import Dashboard from './pages/DashboardNew'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import VerifyEmail from './pages/VerifyEmail'
+import AcceptInvitation from './pages/AcceptInvitation'
+import CompleteInvitation from './pages/CompleteInvitation'
 import Onboarding from './pages/Onboarding'
 import NotionCallback from './pages/NotionCallback'
 import Upload from './pages/Upload'
@@ -33,6 +35,7 @@ import ProjectKanban from './pages/Projects/ProjectKanban'
 import ProjectTimeline from './pages/Projects/ProjectTimeline'
 import ProjectOverview from './pages/Projects/ProjectOverview'
 import ProjectBoQ from './pages/Projects/ProjectBoQ'
+import ProjectFiles from './pages/Projects/ProjectFiles'
 import BoQEditor from './pages/Jobs/BoQEditor'
 
 // Layouts and Components
@@ -81,6 +84,8 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <LandingNew /> },
       { path: '/verify-email', element: <VerifyEmail /> },
+      { path: '/accept-invitation', element: <AcceptInvitation /> },
+      { path: '/complete-invitation', element: <CompleteInvitation /> },
       { path: '/onboarding', element: <Onboarding /> },
       { path: '/privacy', element: <Privacy /> },
       { path: '/terms', element: <Terms /> },
@@ -136,7 +141,7 @@ const router = createBrowserRouter([
               { path: 'kanban', element: <ProjectKanban /> },
               { path: 'timeline', element: <ProjectTimeline /> },
               { path: 'history', element: <ProjectHistory /> },
-              { path: 'files', element: <div>Files placeholder</div> },
+              { path: 'files', element: <ProjectFiles /> },
               { path: 'settings', element: <div>Settings placeholder</div> },
             ],
           },

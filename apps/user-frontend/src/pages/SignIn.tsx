@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Box, Button, TextField, Typography, Alert, Link } from '@mui/material'
 import { useAuth } from '../hooks/useAuth'
 import { auth } from '../services/api'
+import { extractErrorMessage } from '../utils/errorHandler'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -35,7 +36,16 @@ export default function SignIn() {
   const submit = async ()=>{
     const success = await login(email, password)
     if (success) {
-      window.location.href = '/app/dashboard'
+      // Check if there's a pending invitation to accept
+      const pendingToken = localStorage.getItem('pending_invitation_token')
+      if (pendingToken) {
+        // Clear the pending token
+        localStorage.removeItem('pending_invitation_token')
+        // Redirect to accept invitation with the token
+        window.location.href = `/accept-invitation?token=${pendingToken}`
+      } else {
+        window.location.href = '/app/dashboard'
+      }
     }
   }
 
@@ -53,23 +63,24 @@ export default function SignIn() {
     } catch (err: any) {
       console.error('Resend verification error:', err)
       console.error('Error response:', err?.response)
-      
+
       let errorMessage = 'Failed to resend email'
-      
+
       // Handle 429 throttle error from server
       if (err?.response?.status === 429) {
         errorMessage = '⏱️ Please wait before requesting another email.'
         setCooldown(60)
-      } else if (err?.response?.data?.detail) {
-        errorMessage = err.response.data.detail
       } else if (err?.response?.status === 404) {
         errorMessage = '❌ User not found. Please check your email address.'
       } else if (err?.message === 'Network Error' || !err?.response) {
         errorMessage = '❌ Cannot connect to server. Please check your internet connection.'
       } else if (err?.response?.status === 500) {
         errorMessage = '⚠️ Server error. Please try again later.'
+      } else {
+        // Use the error handler utility for other cases
+        errorMessage = extractErrorMessage(err, 'Failed to resend email')
       }
-      
+
       setResendError(errorMessage)
     } finally {
       setResendLoading(false)

@@ -177,7 +177,11 @@ class CollaborationService:
         ).first()
 
         if existing:
-            raise ValueError(f"Pending invitation already exists for {email}")
+            expires_date = existing.expires_at.strftime('%Y-%m-%d') if existing.expires_at else 'unknown'
+            raise ValueError(
+                f"An invitation for {email} is already pending (expires {expires_date}). "
+                f"Please wait for them to accept or revoke the existing invitation first."
+            )
 
         # Create invitation
         invitation = ProjectInvitation(
@@ -232,6 +236,64 @@ class CollaborationService:
             pass  # No event loop running
 
         return invitation, token
+
+    def validate_invitation_token(
+        self,
+        db: Session,
+        token: str
+    ) -> dict:
+        """
+        Validate an invitation token without requiring authentication.
+
+        Returns invitation details and whether a user with that email already exists.
+        This is used to decide if we need to create an account or just log in.
+        """
+        from app.models.user import User
+        from app.models.project import Project
+
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+        invitation = db.query(ProjectInvitation).filter(
+            ProjectInvitation.token_hash == token_hash
+        ).first()
+
+        if not invitation:
+            raise ValueError("Invalid invitation token")
+
+        # Check if already accepted
+        if invitation.status == 'accepted':
+            raise ValueError("This invitation has already been accepted")
+
+        # Check if revoked
+        if invitation.status == 'revoked':
+            raise ValueError("This invitation has been revoked")
+
+        # Check expiration
+        if invitation.expires_at and invitation.expires_at < datetime.now(timezone.utc):
+            invitation.status = 'expired'
+            db.commit()
+            raise ValueError("This invitation has expired")
+
+        # Check if user with this email already exists
+        existing_user = db.query(User).filter(
+            User.email == invitation.email
+        ).first()
+
+        # Get project name
+        project = db.query(Project).filter(
+            Project.id == invitation.project_id
+        ).first()
+
+        return {
+            "valid": True,
+            "email": invitation.email,
+            "role": invitation.role,
+            "project_id": invitation.project_id,
+            "project_name": project.name if project else "Unknown",
+            "user_exists": existing_user is not None,
+            "user_verified": existing_user.email_verified if existing_user else False,
+            "expires_at": invitation.expires_at.isoformat() if invitation.expires_at else None
+        }
 
     def accept_invitation(
         self,

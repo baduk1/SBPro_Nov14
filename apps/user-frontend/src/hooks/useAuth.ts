@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import api from '../services/api'
+import { extractErrorMessage } from '../utils/errorHandler'
 
 export function useAuth() {
   const [loading, setLoading] = useState(false)
@@ -25,16 +26,14 @@ export function useAuth() {
       console.error('Login error:', e)
       console.error('Error response:', e?.response)
       console.error('Error data:', e?.response?.data)
-      
+
       let errorMessage = 'Login failed'
-      
-      if (e?.response?.data?.detail) {
-        // Backend returned specific error
-        errorMessage = e.response.data.detail
-      } else if (e?.response?.status === 400) {
-        errorMessage = '❌ Incorrect email or password. Please try again.'
+
+      // Handle specific error cases with custom messages
+      if (e?.response?.status === 400) {
+        errorMessage = extractErrorMessage(e, '❌ Incorrect email or password. Please try again.')
       } else if (e?.response?.status === 403) {
-        errorMessage = '🔒 Email not verified. Please check your inbox for the verification link.'
+        errorMessage = extractErrorMessage(e, '🔒 Email not verified. Please check your inbox for the verification link.')
       } else if (e?.response?.status === 404) {
         errorMessage = '❌ Account not found. Please check your email or sign up.'
       } else if (e?.response?.status === 500) {
@@ -43,8 +42,11 @@ export function useAuth() {
         errorMessage = '❌ Cannot connect to server. Please check your internet connection or try again later.'
       } else if (e?.code === 'ECONNABORTED') {
         errorMessage = '⏱️ Request timeout. Please check your connection and try again.'
+      } else {
+        // Use error handler utility for other cases
+        errorMessage = extractErrorMessage(e, 'Login failed')
       }
-      
+
       setError(errorMessage)
       setLoading(false)
       return false

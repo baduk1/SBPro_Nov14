@@ -143,7 +143,7 @@ export default function BoQSummaryWidget({ projectId }: BoQSummaryWidgetProps) {
             BoQ Summary
           </Typography>
           <Alert severity="info">
-            No BoQ data available yet. Upload an IFC file to get started.
+            No BoQ data available yet. Upload a file (IFC, PDF, DWG) to get started.
           </Alert>
         </CardContent>
       </Card>

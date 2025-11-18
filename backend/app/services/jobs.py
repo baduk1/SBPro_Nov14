@@ -14,7 +14,7 @@ from app.models.file import File
 from app.models.user import User
 from app.services.sse import broker
 from app.services.takeoff.ifc_validator import validate_ifc
-from app.services.storage import mapping_file_path
+from app.services.storage import mapping_file_path, uploads_path
 from app.services.takeoff.ifc_takeoff import run_ifc_takeoff
 from app.services.takeoff.dwg_takeoff import run_dwg_takeoff
 from app.services.pricing import apply_prices as apply_prices_service
@@ -119,7 +119,7 @@ def process_job(job_id: str) -> None:
         _emit(db, job_id, "validating", "Validating model...", progress=15)
         valid, warnings = (True, [])
         if file.type.upper() == "IFC":
-            valid, warnings = validate_ifc(file_path=f"storage/uploads/{file.id}")
+            valid, warnings = validate_ifc(file_path=uploads_path(file.id))
         time.sleep(0.1)
         if not valid:
             job.status = "failed"
@@ -140,7 +140,7 @@ def process_job(job_id: str) -> None:
         time.sleep(0.1)
 
         items: List[Dict] = []
-        upload_path = f"storage/uploads/{file.id}"
+        upload_path = uploads_path(file.id)
         ftype = (file.type or "").upper()
         try:
             if ftype == "IFC":

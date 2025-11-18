@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import { Visibility, VisibilityOff, CheckCircle } from '@mui/icons-material'
 import { auth } from '../services/api'
+import { extractErrorMessage } from '../utils/errorHandler'
 
 export default function SignUp() {
   const navigate = useNavigate()
@@ -76,25 +77,25 @@ export default function SignUp() {
       console.error('Registration error:', err)
       console.error('Error response:', err?.response)
       console.error('Error data:', err?.response?.data)
-      
-      // Extract the most specific error message possible
+
       let errorMessage = 'Registration failed. Please try again.'
-      
-      if (err?.response?.data?.detail) {
-        // Backend returned a specific error message
-        errorMessage = err.response.data.detail
-      } else if (err?.response?.status === 400) {
-        errorMessage = 'Invalid registration data. Please check your input and try again.'
+
+      // Handle specific status codes
+      if (err?.response?.status === 400) {
+        errorMessage = extractErrorMessage(err, 'Invalid registration data. Please check your input and try again.')
       } else if (err?.response?.status === 409 || err?.response?.status === 422) {
-        errorMessage = 'This email is already registered. Please sign in or use a different email.'
+        errorMessage = extractErrorMessage(err, 'This email is already registered. Please sign in or use a different email.')
       } else if (err?.response?.status === 500) {
         errorMessage = 'Server error. Please try again later or contact support.'
       } else if (err?.message === 'Network Error' || !err?.response) {
         errorMessage = '❌ Cannot connect to server. Please check your internet connection or try again later.'
       } else if (err?.code === 'ECONNABORTED') {
         errorMessage = 'Request timeout. Please check your connection and try again.'
+      } else {
+        // Use error handler utility for other cases
+        errorMessage = extractErrorMessage(err, 'Registration failed. Please try again.')
       }
-      
+
       setError(errorMessage)
     } finally {
       setLoading(false)
@@ -112,19 +113,20 @@ export default function SignUp() {
     } catch (err: any) {
       console.error('Resend verification error:', err)
       console.error('Error response:', err?.response)
-      
+
       let errorMessage = 'Failed to resend verification email'
-      
-      if (err?.response?.data?.detail) {
-        errorMessage = err.response.data.detail
-      } else if (err?.message === 'Network Error' || !err?.response) {
+
+      if (err?.message === 'Network Error' || !err?.response) {
         errorMessage = '❌ Cannot connect to server. Please check your internet connection.'
       } else if (err?.response?.status === 404) {
         errorMessage = 'User not found. Please try registering again.'
       } else if (err?.response?.status === 500) {
         errorMessage = 'Server error. Please try again later.'
+      } else {
+        // Use error handler utility for other cases
+        errorMessage = extractErrorMessage(err, 'Failed to resend verification email')
       }
-      
+
       setError(errorMessage)
     } finally {
       setLoading(false)

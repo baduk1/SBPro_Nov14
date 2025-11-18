@@ -19,6 +19,8 @@ router = APIRouter()
 @router.get("", response_model=List[ProjectOut])
 def list_projects(user: User = Depends(current_user), db: Session = Depends(get_db)):
     """List all projects where user is owner or collaborator"""
+    import logging
+    logger = logging.getLogger(__name__)
     from app.modules.collaboration.models import ProjectCollaborator
 
     # Get project IDs where user is a collaborator
@@ -28,9 +30,15 @@ def list_projects(user: User = Depends(current_user), db: Session = Depends(get_
     collab_project_ids = [pid[0] for pid in collab_project_ids]
 
     # Return all projects where user is owner OR collaborator
-    return db.query(Project).filter(
+    projects = db.query(Project).filter(
         (Project.owner_id == user.id) | (Project.id.in_(collab_project_ids))
     ).all()
+
+    logger.info(f"list_projects for user {user.email} ({user.id}): returning {len(projects)} projects")
+    logger.info(f"  - Owned projects: {len([p for p in projects if p.owner_id == user.id])}")
+    logger.info(f"  - Collaborated projects: {len(collab_project_ids)}")
+
+    return projects
 
 
 @router.post("", response_model=ProjectOut)
@@ -134,6 +142,53 @@ def delete_project(
     db.commit()
 
     return {"message": "Project deleted successfully", "id": id}
+
+
+@router.get("/{id}/files")
+def get_project_files(
+    id: str,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all files uploaded for this project - owner or collaborator can access"""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"get_project_files called for project_id={id}, user_id={user.id}")
+
+    # Verify project exists
+    project = db.query(Project).filter(Project.id == id).first()
+    if not project:
+        logger.warning(f"Project {id} not found")
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    logger.info(f"Project found: {project.name}, owner_id={project.owner_id}")
+
+    # Check if user is owner OR collaborator
+    is_owner = project.owner_id == user.id
+    is_collaborator = db.query(ProjectCollaborator).filter(
+        ProjectCollaborator.project_id == id,
+        ProjectCollaborator.user_id == user.id
+    ).first() is not None
+
+    logger.info(f"Access check: is_owner={is_owner}, is_collaborator={is_collaborator}")
+
+    if not (is_owner or is_collaborator):
+        logger.warning(f"User {user.id} not authorized for project {id}")
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Get all files for this project
+    files = db.query(File).filter(File.project_id == id).order_by(File.uploaded_at.desc()).all()
+    logger.info(f"Found {len(files)} files for project {id}")
+
+    return [{
+        "id": f.id,
+        "filename": f.filename,
+        "type": f.type,
+        "size": f.size or 0,
+        "created_at": f.uploaded_at.isoformat() if f.uploaded_at else None,
+        "project_id": f.project_id,
+        "user_id": f.user_id
+    } for f in files]
 
 
 @router.get("/{id}/history", response_model=List[Dict[str, Any]])

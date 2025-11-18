@@ -223,7 +223,7 @@ def create_collaboration_router(
 
     # ==================== Invitations ====================
 
-    @router.post("/projects/{project_id}/invite", response_model=InvitationResponse, status_code=status.HTTP_201_CREATED)
+    @router.post("/projects/{project_id}/invite", status_code=status.HTTP_201_CREATED)
     def invite_collaborator(
         project_id: str,
         data: InvitationCreate,
@@ -235,10 +235,14 @@ def create_collaboration_router(
 
         Requires: editor role or higher
         """
+        logger.info(f"Invite request: project_id={project_id}, email={data.email}, role={data.role}, user={current_user.id}")
+
         # Check permissions
         project, user_role = permissions.require_project_access(
             project_id, "editor", db, current_user
         )
+
+        logger.info(f"Permission check passed: user_role={user_role}")
 
         # Only owners can invite as owner
         if data.role == "owner" and user_role != "owner":
@@ -248,10 +252,12 @@ def create_collaboration_router(
             )
 
         try:
+            logger.info(f"Creating invitation for {data.email}")
             invitation, token = service.create_invitation(
                 db, project_id, data.email, data.role,
                 current_user.id, data.expires_in_days
             )
+            logger.info(f"Invitation created: id={invitation.id}, token={token[:10]}...")
 
             # TODO: Send email with invitation link containing token
             # For now, return the token in response (in production, send via email)
@@ -262,11 +268,50 @@ def create_collaboration_router(
                 {"email": data.email, "role": data.role}
             )
 
+            # Return clean dict without SQLAlchemy internals
             return {
-                **invitation.__dict__,
+                "id": invitation.id,
+                "project_id": invitation.project_id,
+                "email": invitation.email,
+                "role": invitation.role,
+                "status": invitation.status,
+                "invited_at": invitation.invited_at,
+                "expires_at": invitation.expires_at,
                 "_token": token  # TEMPORARY: should be sent via email only
             }
 
+        except ValueError as e:
+            logger.error(f"Invitation failed with ValueError: {str(e)}")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except Exception as e:
+            logger.exception(f"Unexpected error during invitation: {str(e)}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred")
+
+    @router.get("/invitations/validate")
+    def validate_invitation(
+        token: str = Query(..., description="Invitation token from email"),
+        db: Session = Depends(get_db)
+    ):
+        """
+        Validate an invitation token WITHOUT requiring authentication.
+
+        Returns:
+        - valid: bool
+        - email: str - email address this invitation is for
+        - role: str - role they will have in project
+        - project_id: str
+        - project_name: str
+        - user_exists: bool - whether a user with this email already exists
+        - user_verified: bool - whether the existing user is verified
+
+        This endpoint helps decide the user flow:
+        - If user_exists=false: redirect to simplified registration
+        - If user_exists=true and not logged in: redirect to sign in
+        - If user_exists=true and logged in: accept invitation
+        """
+        try:
+            result = service.validate_invitation_token(db, token)
+            return result
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -278,8 +323,19 @@ def create_collaboration_router(
     ):
         """
         Accept a project invitation using the token from email.
+        Requires authentication - user must be logged in.
         """
         try:
+            # First validate the token to get invitation details
+            validation = service.validate_invitation_token(db, data.token)
+
+            # Check that the logged-in user's email matches the invitation
+            if current_user.email.lower() != validation['email'].lower():
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"This invitation is for {validation['email']}, but you are logged in as {current_user.email}. Please log out and sign in with the correct account."
+                )
+
             collaborator = service.accept_invitation(db, data.token, current_user.id)
 
             # Log activity

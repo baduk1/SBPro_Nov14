@@ -133,13 +133,44 @@ def apply_prices_endpoint(
 
 @router.get("/{id}/boq", response_model=List[BoqItemOut])
 def get_boq(id: str, user=Depends(current_user), db: Session = Depends(get_db)):
-    """Get BOQ items for a job - ownership verified"""
+    """Get BOQ items for a job with source file information - ownership verified"""
+    from app.models.file import File
+
     # CRITICAL: Verify job ownership first
     j = db.query(Job).filter(Job.id == id, Job.user_id == user.id).first()
     if not j:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    return db.query(BoqItem).filter(BoqItem.job_id == id).all()
+    # Get BoQ items with file info via JOIN
+    items = db.query(BoqItem, File.filename, File.id.label('file_id'))\
+        .join(Job, BoqItem.job_id == Job.id)\
+        .join(File, Job.file_id == File.id)\
+        .filter(BoqItem.job_id == id)\
+        .all()
+
+    # Build response with file info
+    result = []
+    for boq_item, filename, file_id in items:
+        item_dict = {
+            "id": boq_item.id,
+            "job_id": boq_item.job_id,
+            "code": boq_item.code,
+            "description": boq_item.description,
+            "unit": boq_item.unit,
+            "qty": boq_item.qty,
+            "source_ref": boq_item.source_ref,
+            "mapped_price_item_id": boq_item.mapped_price_item_id,
+            "allowance_amount": boq_item.allowance_amount,
+            "unit_price": boq_item.unit_price,
+            "total_price": boq_item.total_price,
+            "created_at": boq_item.created_at,
+            "updated_at": boq_item.updated_at,
+            "filename": filename,
+            "file_id": file_id
+        }
+        result.append(item_dict)
+
+    return result
 
 
 @router.patch("/boq/items/{item_id}", response_model=BoqItemOut)

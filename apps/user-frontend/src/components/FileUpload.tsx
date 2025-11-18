@@ -47,8 +47,8 @@ export default function FileUpload({ preselectedProjectId }: FileUploadProps) {
     loadProject()
   }, [preselectedProjectId])
 
-  // Default acceptance: IFC models and PDF plans for take-off
-  const accept = '.ifc,.pdf,model/x-ifc,application/pdf,application/octet-stream'
+  // Default acceptance: IFC/DWG models and PDF plans for take-off
+  const accept = '.ifc,.pdf,.dwg,.dxf,model/x-ifc,application/pdf,application/octet-stream'
 
   // Drag & Drop
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function FileUpload({ preselectedProjectId }: FileUploadProps) {
     try {
       // Determine file type from extension
       const ext = file.name.split('.').pop()?.toLowerCase()
-      let fileType = 'IFC' // default
+      let fileType: 'IFC' | 'DWG' | 'DXF' | 'PDF' = 'IFC' // default
       if (ext === 'pdf') fileType = 'PDF'
       else if (ext === 'dwg') fileType = 'DWG'
       else if (ext === 'dxf') fileType = 'DXF'
@@ -86,7 +86,7 @@ export default function FileUpload({ preselectedProjectId }: FileUploadProps) {
 
       // 1) Presign with correct file type
       const contentType = file.type || 'application/octet-stream'
-      const { file_id, upload_url, headers } = await uploads.presign(projectId, file.name, contentType, fileType as 'IFC' | 'DWG' | 'DXF' | 'PDF')
+      const { file_id, upload_url, headers } = await uploads.presign(projectId, file.name, contentType, fileType)
       const absoluteUploadUrl = new URL(upload_url, API_URL).toString()
       // 2) Upload to storage via absolute URL
       await axios.put(absoluteUploadUrl, file, {
@@ -126,10 +126,10 @@ export default function FileUpload({ preselectedProjectId }: FileUploadProps) {
           '&.drag-over': { borderColor: 'primary.main', backgroundColor: 'rgba(0,229,168,0.06)' }
         }}>
           <Typography variant="subtitle1" sx={{mb:2}}>
-            Drag an <strong>.ifc</strong> or <strong>.pdf</strong> file here or choose it from your computer
+            Drag a file here or choose it from your computer
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{display:'block', mt:1}}>
-            (.dwg support coming soon)
+            Supported formats: .ifc, .pdf, .dwg, .dxf
           </Typography>
           <Button variant="outlined" component="label">
             Choose file

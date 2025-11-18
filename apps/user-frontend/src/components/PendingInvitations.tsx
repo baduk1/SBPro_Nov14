@@ -21,8 +21,7 @@ import {
 } from '@mui/material';
 import { Delete, Email, Schedule, Send } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProjectInvitation } from '../services/api';
-import api from '../services/api';
+import { ProjectInvitation, collaboration, API_URL } from '../services/api';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -51,7 +50,7 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
   } = useQuery({
     queryKey: ['invitations', projectId],
     queryFn: async () => {
-      return api.collaboration.listInvitations(projectId, 'pending');
+      return collaboration.listInvitations(projectId, 'pending');
     },
     enabled: !!projectId,
   });
@@ -64,7 +63,7 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
     const token = localStorage.getItem('token');
 
     const eventSource = new EventSource(
-      `${api.API_URL}/projects/${projectId}/invitations/stream${token ? `?access_token=${token}` : ''}`,
+      `${API_URL}/projects/${projectId}/invitations/stream${token ? `?access_token=${token}` : ''}`,
       { withCredentials: true }
     );
 
@@ -85,7 +84,7 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
   // Revoke invitation mutation
   const revokeMutation = useMutation({
     mutationFn: async (invitationId: number) => {
-      return api.collaboration.revokeInvitation(invitationId);
+      return collaboration.revokeInvitation(invitationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invitations', projectId] });
@@ -98,7 +97,7 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
   // Resend invitation mutation
   const resendMutation = useMutation({
     mutationFn: async (invitationId: number) => {
-      return api.collaboration.resendInvitation(invitationId);
+      return collaboration.resendInvitation(invitationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invitations', projectId] });
@@ -148,20 +147,32 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
             <ListItem
               key={invitation.id}
               sx={{
+                py: 2.5,
+                px: 2,
                 borderBottom: 1,
                 borderColor: 'divider',
                 '&:last-child': { borderBottom: 0 },
+                alignItems: 'flex-start',
               }}
               secondaryAction={
                 status === 'pending' && (
-                  <Box display="flex" gap={0.5}>
-                    <Tooltip title="Resend invitation">
+                  <Box display="flex" gap={1} sx={{ mt: 0.5 }}>
+                    <Tooltip title="Resend invitation email">
                       <IconButton
                         onClick={() => {
                           resendMutation.mutate(invitation.id);
                         }}
                         disabled={resendMutation.isPending}
-                        sx={{ minWidth: 44, minHeight: 44 }}
+                        size="medium"
+                        color="primary"
+                        sx={{
+                          border: 1,
+                          borderColor: 'divider',
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            bgcolor: 'primary.50'
+                          }
+                        }}
                         aria-label="Resend invitation"
                       >
                         <Send fontSize="small" />
@@ -171,12 +182,21 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
                       <IconButton
                         edge="end"
                         onClick={() => {
-                          if (window.confirm('Revoke this invitation?')) {
+                          if (window.confirm('Are you sure you want to revoke this invitation?')) {
                             revokeMutation.mutate(invitation.id);
                           }
                         }}
                         disabled={revokeMutation.isPending}
-                        sx={{ minWidth: 44, minHeight: 44 }}
+                        size="medium"
+                        color="error"
+                        sx={{
+                          border: 1,
+                          borderColor: 'divider',
+                          '&:hover': {
+                            borderColor: 'error.main',
+                            bgcolor: 'error.50'
+                          }
+                        }}
                         aria-label="Revoke invitation"
                       >
                         <Delete fontSize="small" />
@@ -187,31 +207,43 @@ export default function PendingInvitations({ projectId, onError }: PendingInvita
               }
             >
               <ListItemText
+                sx={{ pr: 10 }}
                 primary={
-                  <Box display="flex" alignItems="center" gap={1}>
+                  <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
                     <Email fontSize="small" color="action" />
-                    <Typography variant="body2">{invitation.email}</Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {invitation.email}
+                    </Typography>
                   </Box>
                 }
                 secondary={
-                  <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                  <Box display="flex" alignItems="center" flexWrap="wrap" gap={1.5}>
                     <Chip
                       label={invitation.role}
                       size="small"
                       color="primary"
-                      sx={{ height: 20, textTransform: 'capitalize' }}
+                      variant="outlined"
+                      sx={{
+                        height: 24,
+                        textTransform: 'capitalize',
+                        fontWeight: 500
+                      }}
                     />
                     <Chip
                       label={status}
                       size="small"
                       color={statusColors[status]}
-                      sx={{ height: 20, textTransform: 'capitalize' }}
+                      sx={{
+                        height: 24,
+                        textTransform: 'capitalize',
+                        fontWeight: 500
+                      }}
                     />
                     {invitation.expires_at && (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
                         {isExpired
-                          ? 'Expired'
-                          : `Expires ${dayjs(invitation.expires_at).fromNow()}`}
+                          ? '⏰ Expired'
+                          : `⏰ Expires ${dayjs(invitation.expires_at).fromNow()}`}
                       </Typography>
                     )}
                   </Box>

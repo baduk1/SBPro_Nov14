@@ -160,20 +160,18 @@ export default function ProjectLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* AppBar */}
-      <AppBar
-        position="fixed"
-        elevation={0}
+    <Box>
+      {/* Project Header Bar - below global Navbar */}
+      <Box
         sx={{
-          zIndex: theme.zIndex.drawer + 1,
           bgcolor: 'background.paper',
           color: 'text.primary',
           borderBottom: '1px solid',
           borderColor: 'divider',
+          mb: 2,
         }}
       >
-        <Toolbar>
+        <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1.5 }}>
           {isMobile && (
             <IconButton
               edge="start"
@@ -197,65 +195,66 @@ export default function ProjectLayout() {
           </Typography>
           <NotificationsBell />
           {id && <PresenceBar projectId={id} />}
-        </Toolbar>
-      </AppBar>
-
-      {/* Drawer */}
-      <Box
-        component="nav"
-        sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}
-      >
-        {/* Mobile drawer */}
-        {isMobile ? (
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile
-            }}
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: DRAWER_WIDTH,
-                boxSizing: 'border-box',
-                mt: '64px',
-              },
-            }}
-          >
-            {drawerContent}
-          </Drawer>
-        ) : (
-          /* Desktop drawer */
-          <Drawer
-            variant="permanent"
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: DRAWER_WIDTH,
-                boxSizing: 'border-box',
-                mt: '64px',
-                borderRight: '1px solid',
-                borderColor: 'divider',
-              },
-            }}
-            open
-          >
-            {drawerContent}
-          </Drawer>
-        )}
+        </Box>
       </Box>
 
-      {/* Main content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          mt: '64px',
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          minHeight: 'calc(100vh - 64px)',
-        }}
-      >
-        <Outlet />
+      {/* Content Area with Drawer */}
+      <Box sx={{ display: 'flex' }}>
+        {/* Drawer */}
+        <Box
+          component="nav"
+          sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}
+        >
+          {/* Mobile drawer */}
+          {isMobile ? (
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{
+                keepMounted: true, // Better open performance on mobile
+              }}
+              sx={{
+                '& .MuiDrawer-paper': {
+                  width: DRAWER_WIDTH,
+                  boxSizing: 'border-box',
+                },
+              }}
+            >
+              {drawerContent}
+            </Drawer>
+          ) : (
+            /* Desktop drawer */
+            <Drawer
+              variant="permanent"
+              sx={{
+                '& .MuiDrawer-paper': {
+                  width: DRAWER_WIDTH,
+                  boxSizing: 'border-box',
+                  position: 'relative',
+                  height: 'calc(100vh - 180px)',
+                  borderRight: '1px solid',
+                  borderColor: 'divider',
+                },
+              }}
+              open
+            >
+              {drawerContent}
+            </Drawer>
+          )}
+        </Box>
+
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          }}
+        >
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   )

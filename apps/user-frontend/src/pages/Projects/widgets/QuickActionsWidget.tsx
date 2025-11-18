@@ -2,7 +2,7 @@
  * QuickActionsWidget Component
  *
  * Provides quick access to common project actions:
- * - Upload IFC file
+ * - Upload file (IFC, PDF, DWG)
  * - Apply Pricing
  * - Export BoQ
  */
@@ -47,7 +47,7 @@ export default function QuickActionsWidget({ projectId }: QuickActionsWidgetProp
             onClick={handleUpload}
             fullWidth
           >
-            Upload IFC File
+            Upload File
           </Button>
           <Button
             variant="outlined"

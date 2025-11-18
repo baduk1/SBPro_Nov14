@@ -11,6 +11,7 @@ import {
   Alert
 } from '@mui/material'
 import { projects } from '../services/api'
+import { extractErrorMessage } from '../utils/errorHandler'
 
 interface CreateProjectDialogProps {
   open: boolean
@@ -53,7 +54,7 @@ export default function CreateProjectDialog({ open, onClose, onSuccess }: Create
       onClose()
     } catch (err: any) {
       console.error('Failed to create project:', err)
-      setError(err?.response?.data?.detail || 'Failed to create project')
+      setError(extractErrorMessage(err, 'Failed to create project'))
     } finally {
       setLoading(false)
     }
