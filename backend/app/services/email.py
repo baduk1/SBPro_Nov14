@@ -150,6 +150,95 @@ class EmailService:
         )
 
     @staticmethod
+    def send_invitation_email(
+        to_email: str,
+        inviter_name: str,
+        project_name: str,
+        invitation_token: str,
+        role: str
+    ) -> bool:
+        """Send project invitation email with acceptance link"""
+        invitation_url = f"{settings.FRONTEND_URL}/accept-invitation?token={invitation_token}"
+
+        role_display = role.capitalize()
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }}
+                .button {{ display: inline-block; padding: 14px 28px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }}
+                .project-box {{ background: white; padding: 20px; border-left: 4px solid #667eea; margin: 20px 0; border-radius: 4px; }}
+                .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🤝 You're Invited!</h1>
+                </div>
+                <div class="content">
+                    <p>Hi there,</p>
+                    <p><strong>{inviter_name}</strong> has invited you to collaborate on a project in SkyBuild Pro.</p>
+
+                    <div class="project-box">
+                        <p style="margin: 0 0 10px 0;"><strong>Project:</strong> {project_name}</p>
+                        <p style="margin: 0;"><strong>Your Role:</strong> {role_display}</p>
+                    </div>
+
+                    <p>As a <strong>{role_display}</strong>, you'll be able to:</p>
+                    <ul>
+                        <li>View and collaborate on project documents</li>
+                        <li>Access Bill of Quantities (BoQ)</li>
+                        <li>Comment and provide feedback</li>
+                        <li>{'Edit project data' if role == 'editor' else 'View project progress'}</li>
+                    </ul>
+
+                    <div style="text-align: center;">
+                        <a href="{invitation_url}" class="button">Accept Invitation</a>
+                    </div>
+
+                    <p style="color: #666; font-size: 14px;">This invitation will expire in 7 days.</p>
+                    <p style="color: #666; font-size: 14px;">If you don't have a SkyBuild Pro account yet, you'll be guided through a quick registration process.</p>
+                </div>
+                <div class="footer">
+                    <p>© 2025 SkyBuild Pro. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_content = f"""
+        You're Invited to Collaborate!
+
+        {inviter_name} has invited you to join their project on SkyBuild Pro.
+
+        Project: {project_name}
+        Your Role: {role_display}
+
+        Click this link to accept the invitation:
+        {invitation_url}
+
+        This invitation will expire in 7 days.
+
+        If you don't have an account yet, you'll be guided through registration.
+
+        © 2025 SkyBuild Pro
+        """
+
+        return EmailService.send_email(
+            to_email=to_email,
+            subject=f"Invitation to collaborate on '{project_name}'",
+            html_content=html_content,
+            text_content=text_content
+        )
+
+    @staticmethod
     def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
         """Send welcome email after successful verification"""
         dashboard_url = f"{settings.FRONTEND_URL}/app/dashboard"

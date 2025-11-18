@@ -38,6 +38,7 @@ from app.modules.collaboration.service import CollaborationService
 from app.modules.collaboration.permissions import PermissionChecker
 from app.modules.collaboration.config import CollaborationConfig, SKYBUILD_COLLABORATION_CONFIG
 from app.services.sse import broker
+from app.services.email import EmailService
 
 
 def create_collaboration_router(
@@ -259,8 +260,19 @@ def create_collaboration_router(
             )
             logger.info(f"Invitation created: id={invitation.id}, token={token[:10]}...")
 
-            # TODO: Send email with invitation link containing token
-            # For now, return the token in response (in production, send via email)
+            # Send invitation email
+            try:
+                EmailService.send_invitation_email(
+                    to_email=data.email,
+                    inviter_name=current_user.full_name or current_user.email,
+                    project_name=project.name,
+                    invitation_token=token,
+                    role=data.role
+                )
+                logger.info(f"Invitation email sent to {data.email}")
+            except Exception as e:
+                logger.error(f"Failed to send invitation email to {data.email}: {str(e)}")
+                # Don't fail the request if email fails - invitation is still created
 
             # Log activity
             service.log_activity(
@@ -455,6 +467,22 @@ def create_collaboration_router(
 
         try:
             invitation, token = service.resend_invitation(db, invitation_id)
+
+            # Get project details
+            project_obj = db.query(Project).filter(Project.id == invitation.project_id).first()
+
+            # Send invitation email
+            try:
+                EmailService.send_invitation_email(
+                    to_email=invitation.email,
+                    inviter_name=current_user.full_name or current_user.email,
+                    project_name=project_obj.name if project_obj else "Project",
+                    invitation_token=token,
+                    role=invitation.role
+                )
+                logger.info(f"Resent invitation email to {invitation.email}")
+            except Exception as e:
+                logger.error(f"Failed to resend invitation email to {invitation.email}: {str(e)}")
 
             # Log activity
             service.log_activity(
