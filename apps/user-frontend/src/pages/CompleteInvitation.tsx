@@ -100,9 +100,12 @@ export default function CompleteInvitation() {
       })
 
       // Step 2: Log in immediately
-      const loginResponse = await api.post('/auth/login', {
-        email: validationResult?.email,
-        password: password,
+      const loginData = new URLSearchParams()
+      loginData.append('username', validationResult?.email || '')
+      loginData.append('password', password)
+
+      const loginResponse = await api.post('/auth/login', loginData, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       })
 
       const { access_token } = loginResponse.data
