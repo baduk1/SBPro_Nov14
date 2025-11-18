@@ -1,6 +1,7 @@
-import { AppBar, Toolbar, Typography, IconButton, Box, InputBase, Chip } from '@mui/material'
-import { DarkMode, LightMode, Search } from '@mui/icons-material'
+import { AppBar, Toolbar, Typography, IconButton, Box, InputBase, Chip, Button } from '@mui/material'
+import { DarkMode, LightMode, Search, Logout } from '@mui/icons-material'
 import { useColorMode } from '../hooks/useColorMode'
+import { useAuth } from '../hooks/useAuth'
 
 interface NavbarProps {
   title: string
@@ -9,6 +10,7 @@ interface NavbarProps {
 
 export default function Navbar({ title, onSearchClick }: NavbarProps) {
   const { mode, toggleMode } = useColorMode()
+  const { logout } = useAuth()
 
   // Detect OS for keyboard shortcut display
   const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
@@ -80,6 +82,25 @@ export default function Navbar({ title, onSearchClick }: NavbarProps) {
         >
           {mode === 'dark' ? <LightMode /> : <DarkMode />}
         </IconButton>
+
+        {/* Logout button */}
+        <Button
+          onClick={logout}
+          color="inherit"
+          startIcon={<Logout />}
+          sx={{
+            textTransform: 'none',
+            fontWeight: 500,
+            px: 2,
+            borderRadius: 2,
+            '&:hover': {
+              bgcolor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+            },
+          }}
+          aria-label="Sign out"
+        >
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   )
